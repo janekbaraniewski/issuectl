@@ -1,7 +1,6 @@
 package issuectl
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -17,10 +16,7 @@ type Logger struct {
 
 // NewLogger parses command line argument for verbosity level and returns a new Logger
 func NewLogger() *Logger {
-	v := flag.Int("v", 1, "verbosity level")
-	flag.Parse()
-
-	return &Logger{verbosity: *v}
+	return &Logger{verbosity: 1} // FIXME: get verbosity level from cobra
 }
 
 // Infof formats the log message and calls output function with default level 1
