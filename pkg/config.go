@@ -70,3 +70,78 @@ func LoadConfig() *IssuectlConfig {
 
 	return config
 }
+
+// Issues
+
+func AddIssue(issueConfig *IssueConfig) error {
+	config := LoadConfig()
+
+	config.Issues = append(config.Issues, *issueConfig)
+
+	return config.Save()
+}
+
+func DeleteIssue(issueID IssueID) error {
+	config := LoadConfig()
+
+	for i, ic := range config.Issues {
+		if ic.ID == issueID {
+			if i < len(config.Issues) {
+				config.Issues = append(config.Issues[:i], config.Issues[i+1:]...)
+			} else {
+				config.Issues = config.Issues[:i]
+			}
+			config.Save()
+			return nil
+		}
+	}
+
+	return nil
+}
+
+func GetIssue(issueID IssueID) *IssueConfig {
+	config := LoadConfig()
+
+	for _, ic := range config.Issues {
+		if ic.ID == issueID {
+			return &ic
+		}
+	}
+
+	return nil
+}
+
+// Repositories
+
+func ListRepositories() error {
+	config := LoadConfig()
+
+	Log.Infof("%v", config.Repositories)
+
+	return nil
+}
+
+func GetRepository(name RepoConfigName) *RepoConfig {
+	config := LoadConfig()
+
+	for _, rc := range config.Repositories {
+		if rc.Name == name {
+			return &rc
+		}
+	}
+
+	return nil
+}
+
+func AddRepository(repoConfig *RepoConfig) error {
+	config := LoadConfig()
+
+	config.Repositories = append(config.Repositories, *repoConfig)
+
+	if err := config.Save(); err != nil {
+		Log.Infof("ERROR!!!! %v", err)
+		return err
+	}
+
+	return nil
+}
