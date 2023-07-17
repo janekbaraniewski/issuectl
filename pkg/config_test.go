@@ -8,9 +8,11 @@ import (
 )
 
 func TestGetRepository(t *testing.T) {
-	config := issuectl.GetRepository("multi-cloud")
-	assert.NotNil(t, config)
+	config := issuectl.LoadConfig()
 
-	config = issuectl.GetRepository("some-name-that-doesnt-exist")
-	assert.Nil(t, config)
+	repo := config.GetRepository("multi-cloud")
+	assert.NotNil(t, repo)
+
+	repo = config.GetRepository("some-name-that-doesnt-exist")
+	assert.Nil(t, repo)
 }

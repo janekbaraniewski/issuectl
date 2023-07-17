@@ -14,7 +14,8 @@ func initRepoListCommand(rootCmd *cobra.Command) {
 		Long:               "",
 		FParseErrWhitelist: cobra.FParseErrWhitelist{UnknownFlags: true},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return issuectl.ListRepositories()
+			config := issuectl.LoadConfig()
+			return config.ListRepositories()
 		},
 	}
 
@@ -34,11 +35,12 @@ func initRepoAddCommand(rootCmd *cobra.Command) {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			config := &issuectl.RepoConfig{
+			conf := issuectl.LoadConfig()
+			repoConfig := &issuectl.RepoConfig{
 				Name:    issuectl.RepoConfigName(args[0]),
 				RepoUrl: issuectl.RepoUrl(args[1]),
 			}
-			return issuectl.AddRepository(config)
+			return conf.AddRepository(repoConfig)
 		},
 	}
 
