@@ -1,6 +1,12 @@
+GOCMD?=go
+
 APP_VERSION?=$(shell git describe --dirty --tags --match "v[0-9]*" )
 
 PKG_SRC=$(shell find . -type f -name '*.go')
+GOOS=$(shell $(GOCMD) env GOOS)
+GOARCH=$(shell $(GOCMD) env GOARCH)
+
+BIN_NAME=issuectl-$(GOOS)-$(GOARCH) # -$(APP_VERSION)
 
 SHELL = /usr/bin/env bash -o pipefail
 .SHELLFLAGS = -ec
@@ -37,4 +43,4 @@ check: lint vet fmt
 
 issuectl: ## Build issuectl binary
 issuectl: $(PKG_SRC) cmd
-	go build -o issuectl cmd/main.go
+	go build -o ${BIN_NAME} cmd/main.go
