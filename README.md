@@ -9,7 +9,7 @@
 
 You select your `workdir` using `ISSUECTL_WORKDIR` env var (TODO: move this to config).
 
-```
+```txt
 workdir
 ├── issue-1
 │   ├── project1@branch1
