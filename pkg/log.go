@@ -47,7 +47,7 @@ func (l *Logger) output(level int, message string) {
 		file = file[strings.LastIndex(file, "/")+1:]
 		log.SetOutput(os.Stdout)
 		log.SetFlags(0)
-		log.Println(fmt.Sprintf("%v|%s| %s", time.Now().Format(time.RFC3339), file, message))
+		log.Printf("%v|%s| %s\n", time.Now().Format(time.RFC3339), file, message)
 	}
 }
 
