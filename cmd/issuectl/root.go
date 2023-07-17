@@ -21,6 +21,7 @@ func RootCmd() *cobra.Command {
 
 	initStartCommand(cmd)
 	initFinishCommand(cmd)
+	initRepositoriesCommand(cmd)
 	return cmd
 }
 
