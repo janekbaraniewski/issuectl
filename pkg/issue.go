@@ -1,5 +1,10 @@
 package issuectl
 
+import (
+	"os"
+	"path/filepath"
+)
+
 func StartWorkingOnIssue(issueID IssueID) error {
 	config := LoadConfig()
 	Log.Infof("Starting work on issue %v ...", issueID)
@@ -20,6 +25,17 @@ func StartWorkingOnIssue(issueID IssueID) error {
 	}
 
 	Log.Infof("Started working on issue %v", issueID)
+
+	return nil
+}
+
+func FinishWorkingOnIssue(issueID IssueID) error {
+	config := LoadConfig()
+
+	Log.Infof("Cleaning up after work on issue %v", issueID)
+	if err := os.RemoveAll(filepath.Join(config.WorkDir, string(issueID))); err != nil {
+		return err
+	}
 
 	return nil
 }
