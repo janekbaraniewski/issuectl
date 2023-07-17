@@ -1,11 +1,9 @@
 package main
 
 import (
-	issuectl "github.com/janekbaraniewski/issuectl/pkg"
+	cli "github.com/janekbaraniewski/issuectl/cmd/issuectl"
 )
 
 func main() {
-	if err := issuectl.StartWorkingOnIssue("test-automated-issue"); err != nil {
-		issuectl.Log.Infof("%v", err)
-	}
+	cli.Execute()
 }
