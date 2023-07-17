@@ -1,5 +1,7 @@
 APP_VERSION?=$(shell git describe --dirty --tags --match "v[0-9]*" )
 
+PKG_SRC=$(shell find . -type f -name '*.go')
+
 SHELL = /usr/bin/env bash -o pipefail
 .SHELLFLAGS = -ec
 
@@ -31,5 +33,8 @@ lint:
 check: ## Run all static checks
 check: lint vet fmt
 
-issuectl:
+##@ Build
+
+issuectl: ## Build issuectl binary
+issuectl: $(PKG_SRC) cmd
 	go build -o issuectl cmd/main.go
