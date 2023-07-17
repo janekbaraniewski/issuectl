@@ -1,21 +1,15 @@
 package issuectl
 
-var multiCloudRepo = &RepoConfig{
-	Name:    "multi-cloud",
-	RepoUrl: "git@github.com:elotl/multi-cloud.git",
-}
-
-var WorkDir string = "/Users/janbaraniewski/Workspace/priv/issuectl/testWorkdir" // FIXME
-
 func StartWorkingOnIssue(issueID IssueID) error {
+	config := LoadConfig()
 	Log.Infof("Starting work on issue %v ...", issueID)
 	Log.V(2).Infof("Creating issue work dir")
-	issueDirPath, err := createDirectory(WorkDir, string(issueID))
+	issueDirPath, err := createDirectory(config.WorkDir, string(issueID))
 	if err != nil {
 		return err
 	}
 	Log.V(2).Infof("Cloning repo")
-	repoDirPath, err := cloneRepo(multiCloudRepo, issueDirPath)
+	repoDirPath, err := cloneRepo(&config.Repositories[0], issueDirPath) // FIXME: should use repo name to get repo config instead of getting it with direct array access
 	if err != nil {
 		return err
 	}
