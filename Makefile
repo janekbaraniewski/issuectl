@@ -14,5 +14,22 @@ help: ## Display this help.
 test: ## Run tests
 	go test ./...
 
+
+.PHONY: fmt
+fmt: ## Run go fmt against code.
+	go fmt ./...
+
+.PHONY: vet
+vet: ## Run go vet against code.
+	go vet ./...
+
+.PHONY: lint
+lint:
+	golangci-lint run
+
+.PHONY: check
+check: ## Run all static checks
+check: lint vet fmt
+
 issuectl:
 	go build -o issuectl cmd/main.go
