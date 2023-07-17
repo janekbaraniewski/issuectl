@@ -20,7 +20,7 @@ func RootCmd() *cobra.Command {
 	}
 
 	initStartCommand(cmd)
-
+	initFinishCommand(cmd)
 	return cmd
 }
 
