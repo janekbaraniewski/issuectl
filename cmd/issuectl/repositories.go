@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"errors"
+
 	issuectl "github.com/janekbaraniewski/issuectl/pkg"
 	"github.com/spf13/cobra"
 )
@@ -25,8 +27,18 @@ func initRepoAddCommand(rootCmd *cobra.Command) {
 		Short:              "",
 		Long:               "",
 		FParseErrWhitelist: cobra.FParseErrWhitelist{UnknownFlags: true},
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) < 2 || len(args) > 2 {
+				return errors.New("you must provide exactly 2 arguments - name and url of repository")
+			}
+			return nil
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return issuectl.AddRepository()
+			config := &issuectl.RepoConfig{
+				Name:    issuectl.RepoConfigName(args[0]),
+				RepoUrl: issuectl.RepoUrl(args[1]),
+			}
+			return issuectl.AddRepository(config)
 		},
 	}
 

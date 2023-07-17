@@ -1,26 +1,56 @@
 package issuectl
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 )
 
-func AddIssue(name string, issueID IssueID, repo RepoConfigName, backend BackendConfigName, issueDirPath string) error {
+func AddIssue(issueConfig *IssueConfig) error {
 	config := LoadConfig()
 
-	config.Issues = append(config.Issues, IssueConfig{
-		Name:        name,
-		ID:          issueID,
-		RepoName:    repo,
-		BackendName: backend,
-		Dir:         issueDirPath,
-	})
+	config.Issues = append(config.Issues, *issueConfig)
 
 	return config.Save()
 }
 
+func DeleteIssue(issueID IssueID) error {
+	config := LoadConfig()
+
+	for i, ic := range config.Issues {
+		if ic.ID == issueID {
+			if i < len(config.Issues) {
+				config.Issues = append(config.Issues[:i], config.Issues[i+1:]...)
+			} else {
+				config.Issues = config.Issues[:i]
+			}
+			config.Save()
+			return nil
+		}
+	}
+
+	return nil
+}
+
+func GetIssue(issueID IssueID) *IssueConfig {
+	config := LoadConfig()
+
+	for _, ic := range config.Issues {
+		if ic.ID == issueID {
+			return &ic
+		}
+	}
+
+	return nil
+}
+
 func StartWorkingOnIssue(issueID IssueID) error {
 	config := LoadConfig()
+
+	if existing := GetIssue(issueID); existing != nil {
+		return fmt.Errorf("issueID already in use")
+	}
+
 	Log.Infof("Starting work on issue %v ...", issueID)
 	Log.V(2).Infof("Creating issue work dir")
 	issueDirPath, err := createDirectory(config.WorkDir, string(issueID))
@@ -38,7 +68,13 @@ func StartWorkingOnIssue(issueID IssueID) error {
 		return err
 	}
 
-	if err := AddIssue(string(issueID), issueID, config.DefaultRepository, "multi-cloud", issueDirPath); err != nil {
+	if err := AddIssue(&IssueConfig{
+		Name:        string(issueID),
+		ID:          issueID,
+		RepoName:    config.DefaultRepository,
+		BackendName: "github",
+		Dir:         issueDirPath,
+	}); err != nil {
 		return err
 	}
 
@@ -55,5 +91,5 @@ func FinishWorkingOnIssue(issueID IssueID) error {
 		return err
 	}
 
-	return nil
+	return DeleteIssue(issueID)
 }

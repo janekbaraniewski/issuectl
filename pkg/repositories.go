@@ -20,13 +20,10 @@ func GetRepository(name RepoConfigName) *RepoConfig {
 	return nil
 }
 
-func AddRepository() error {
+func AddRepository(repoConfig *RepoConfig) error {
 	config := LoadConfig()
 
-	config.Repositories = append(config.Repositories, RepoConfig{
-		Name:    "test-hehe",
-		RepoUrl: "test-haha",
-	})
+	config.Repositories = append(config.Repositories, *repoConfig)
 
 	if err := config.Save(); err != nil {
 		Log.Infof("ERROR!!!! %v", err)
