@@ -8,14 +8,26 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var configFilePath = "/Users/janbaraniewski/.issuerc"
+var configFilePath = "/Users/janbaraniewski/.issuerc" // FIXME
+
+// ProfileName is a name of issuectl config profile
+type ProfileName string
+
+// Profile is a config profile
+type Profile struct {
+	Name              ProfileName    `json:"name"`
+	WorkDir           string         `json:"workDir"`
+	DefaultRepository RepoConfigName `json:"defaultRepository"`
+}
 
 // IssuectlConfig manages configuration
 type IssuectlConfig struct {
+	CurrentProfile    ProfileName    `json:"currentProfile"`
 	WorkDir           string         `json:"workDir"`
 	DefaultRepository RepoConfigName `json:"defaultRepository"`
 	Repositories      []RepoConfig   `json:"repositories"`
 	Issues            []IssueConfig  `json:"issues"`
+	Profiles          []Profile      `json:"profiles"`
 }
 
 func (c *IssuectlConfig) Save() error {
