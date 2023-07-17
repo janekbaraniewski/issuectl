@@ -42,4 +42,5 @@ type IssueConfig struct {
 	ID          IssueID           `json:"id"`
 	BackendName BackendConfigName `json:"backendName"`
 	RepoName    RepoConfigName    `json:"repoName"`
+	Dir         string            `json:"dir"`
 }

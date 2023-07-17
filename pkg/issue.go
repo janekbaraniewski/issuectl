@@ -5,6 +5,20 @@ import (
 	"path/filepath"
 )
 
+func AddIssue(name string, issueID IssueID, repo RepoConfigName, backend BackendConfigName, issueDirPath string) error {
+	config := LoadConfig()
+
+	config.Issues = append(config.Issues, IssueConfig{
+		Name:        name,
+		ID:          issueID,
+		RepoName:    repo,
+		BackendName: backend,
+		Dir:         issueDirPath,
+	})
+
+	return config.Save()
+}
+
 func StartWorkingOnIssue(issueID IssueID) error {
 	config := LoadConfig()
 	Log.Infof("Starting work on issue %v ...", issueID)
@@ -20,7 +34,11 @@ func StartWorkingOnIssue(issueID IssueID) error {
 	}
 
 	Log.V(2).Infof("Creating branch")
-	if err = createBranch(repoDirPath, string(issueID)); err != nil {
+	if err := createBranch(repoDirPath, string(issueID)); err != nil {
+		return err
+	}
+
+	if err := AddIssue(string(issueID), issueID, config.DefaultRepository, "multi-cloud", issueDirPath); err != nil {
 		return err
 	}
 

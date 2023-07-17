@@ -15,6 +15,7 @@ type IssuectlConfig struct {
 	WorkDir           string         `json:"workDir"`
 	DefaultRepository RepoConfigName `json:"defaultRepository"`
 	Repositories      []RepoConfig   `json:"repositories"`
+	Issues            []IssueConfig  `json:"issues"`
 }
 
 func (c *IssuectlConfig) Save() error {
