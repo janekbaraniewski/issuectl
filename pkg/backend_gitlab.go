@@ -11,6 +11,7 @@ type GitLab struct {
 }
 
 func NewGitLabClient(token, baseURL string) (*GitLab, error) {
+	Log.Infof("NOT TESTED")
 	client, err := gitlab.NewClient(token, gitlab.WithBaseURL(baseURL))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create GitLab client: %v", err)
