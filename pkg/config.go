@@ -2,6 +2,7 @@ package issuectl
 
 import (
 	"errors"
+	"fmt"
 	"io/fs"
 	"io/ioutil"
 	"log"
@@ -110,7 +111,7 @@ func (ic *IssuectlConfig) DeleteIssue(issueID IssueID) error {
 			return nil
 		}
 	}
-	return nil
+	return fmt.Errorf("issue with ID '%s' not found", issueID)
 }
 
 func (ic *IssuectlConfig) GetIssue(issueID IssueID) *IssueConfig {
