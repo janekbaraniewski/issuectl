@@ -1,6 +1,8 @@
 package issuectl
 
 import (
+	"errors"
+	"io/fs"
 	"io/ioutil"
 	"log"
 	"os"
@@ -71,7 +73,13 @@ func LoadConfig() *IssuectlConfig {
 
 	data, err := ioutil.ReadFile(DefaultConfigFilePath)
 	if err != nil {
-		Log.Infof("%v", err)
+		if errors.Is(err, fs.ErrNotExist) {
+			if err := config.Save(); err != nil {
+				Log.Infof("%v", err)
+				return config
+			}
+			return config
+		}
 		return nil
 	}
 
