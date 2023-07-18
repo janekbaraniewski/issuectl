@@ -53,8 +53,13 @@ func StartWorkingOnIssue(issueID IssueID) error {
 		return err
 	}
 
+	issue, err := ghClient.GetIssue(repo.Owner, string(repo.Name), issueID)
+	if err != nil {
+		return fmt.Errorf("failed to get the issue: %v", err)
+	}
+
 	if err := config.AddIssue(&IssueConfig{
-		Name:        string(issueID),
+		Name:        *issue.Title,
 		ID:          issueID,
 		RepoName:    profile.Repository,
 		BackendName: "github",
@@ -72,35 +77,21 @@ func OpenPullRequest(issueID IssueID) error {
 	config := LoadConfig()
 	profile := config.GetProfile(config.CurrentProfile)
 
-	if existing := config.GetIssue(issueID); existing != nil {
-		return fmt.Errorf("issueID already in use")
+	issue := config.GetIssue(issueID)
+	if issue == nil {
+		return fmt.Errorf("issueID not found")
 	}
 	ghClient := NewGitHubClient(GitHubToken)
 	repo := config.GetRepository(profile.Repository)
 
-	if err := ghClient.OpenPullRequest(
+	return ghClient.OpenPullRequest(
 		repo.Owner,
 		string(repo.Name),
-		"PR title", // Replace with your PR title.
-		"PR body",  // Replace with your PR body.
-		"master",   // Replace with the base branch name.
+		fmt.Sprintf("%v | %v", issue.ID, issue.Name),
+		fmt.Sprintf("Resolves #%v", issue.ID),
+		"master", // TODO: make configurable
 		string(issueID),
-	); err != nil {
-		return fmt.Errorf("failed to open a pull request: %v", err)
-	}
-
-	if err := ghClient.LinkIssueToRepo(
-		GitHubApi,
-		repo.Owner,
-		string(repo.Name),
-		string(issueID),
-		"PR number", // Replace with your PR number.
-		GitHubToken, // Replace with your real GitHub token.
-	); err != nil {
-		return fmt.Errorf("failed to link the pull request to the issue: %v", err)
-	}
-
-	return nil
+	)
 }
 
 func FinishWorkingOnIssue(issueID IssueID) error {

@@ -44,7 +44,9 @@ func NewGitHubClient(token string) *GitHub {
 	return &GitHub{client: client}
 }
 
+// IssueExists is DEPRECATED. use GetIssue instead
 func (g *GitHub) IssueExists(owner, repo string, issueID IssueID) (bool, error) {
+	// TODO: deprecate, use GetIssue instead
 	issueNumber, err := getIssueNumberFromString(issueID)
 	if err != nil {
 		return false, err
@@ -56,6 +58,20 @@ func (g *GitHub) IssueExists(owner, repo string, issueID IssueID) (bool, error) 
 	}
 
 	return true, nil
+}
+
+func (g *GitHub) GetIssue(owner, repo string, issueID IssueID) (*github.Issue, error) {
+	issueNumber, err := getIssueNumberFromString(issueID)
+	if err != nil {
+		return nil, err
+	}
+
+	issue, _, err := g.client.Issues.Get(context.Background(), owner, repo, issueNumber)
+	if err != nil {
+		return nil, err
+	}
+
+	return issue, nil
 }
 
 func (g *GitHub) CloseIssue(owner, repo string, issueID IssueID) error {
