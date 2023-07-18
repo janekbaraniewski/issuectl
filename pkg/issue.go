@@ -110,7 +110,7 @@ func OpenPullRequest(issueID IssueID) error {
 	repo := config.GetRepository(profile.Repository)
 	return ghClient.OpenPullRequest(
 		repo.Owner,
-		string(repo.Name),
+		repo.Name,
 		fmt.Sprintf("%v | %v", issue.ID, issue.Name),
 		fmt.Sprintf("Resolves #%v", issue.ID),
 		"master", // TODO: make configurable
