@@ -3,6 +3,8 @@ package issuectl
 import (
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestIssuectlConfig_Save(t *testing.T) {
@@ -81,22 +83,16 @@ func TestIssuectlConfig_DeleteIssue(t *testing.T) {
 		ID: "testIssue",
 	}
 
-	config.AddIssue(issue)
+	config.AddIssue(issue) //nolint:errcheck
 
-	err := config.DeleteIssue(issue.ID)
-	if err != nil {
-		t.Errorf("Expected no error, got %v", err)
-	}
+	assert.NoError(t, config.DeleteIssue(issue.ID))
 
 	if len(config.Issues) != 0 {
 		t.Errorf("Expected 0 issues, got %d", len(config.Issues))
 	}
 
 	// Test deleting a non-existing issue
-	err = config.DeleteIssue("nonExistingIssue")
-	if err == nil {
-		t.Errorf("Expected error, got nil")
-	}
+	assert.Error(t, config.DeleteIssue("nonExistingIssue"))
 
 	// Clean up
 	os.Remove(DefaultConfigFilePath)
@@ -109,14 +105,11 @@ func TestIssuectlConfig_GetIssue(t *testing.T) {
 		ID: "testIssue",
 	}
 
-	config.AddIssue(issue)
+	config.AddIssue(issue) //nolint:errcheck
 
 	retrievedIssue := config.GetIssue(issue.ID)
-	if retrievedIssue == nil {
-		t.Errorf("Expected issue, got nil")
-	}
 
-	if retrievedIssue.ID != issue.ID {
+	if retrievedIssue.ID != issue.ID { //nolint:staticcheck
 		t.Errorf("Expected issue ID '%s', got '%s'", issue.ID, retrievedIssue.ID)
 	}
 
@@ -137,7 +130,7 @@ func TestIssuectlConfig_ListRepositories(t *testing.T) {
 		Name: "testRepo",
 	}
 
-	config.AddRepository(repo)
+	config.AddRepository(repo) //nolint:errcheck
 
 	err := config.ListRepositories()
 	if err != nil {
@@ -155,14 +148,14 @@ func TestIssuectlConfig_GetRepository(t *testing.T) {
 		Name: "testRepo",
 	}
 
-	config.AddRepository(repo)
+	config.AddRepository(repo) //nolint:errcheck
 
 	retrievedRepo := config.GetRepository(repo.Name)
-	if retrievedRepo == nil {
+	if retrievedRepo == nil { //nolint:staticcheck
 		t.Errorf("Expected repository, got nil")
 	}
 
-	if retrievedRepo.Name != repo.Name {
+	if retrievedRepo.Name != repo.Name { //nolint:staticcheck
 		t.Errorf("Expected repository name '%s', got '%s'", repo.Name, retrievedRepo.Name)
 	}
 

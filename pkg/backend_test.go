@@ -52,7 +52,7 @@ func TestGitHub_LinkIssueToRepo(t *testing.T) {
 		}
 
 		body := make([]byte, req.ContentLength)
-		req.Body.Read(body)
+		req.Body.Read(body) //nolint:errcheck
 		if !strings.Contains(string(body), `"issue_number":"1"`) {
 			t.Errorf("Expected body to contain '\"issue_number\":\"1\"', got '%s'", string(body))
 		}
@@ -88,7 +88,7 @@ func TestGitHub_CloseIssue(t *testing.T) {
 		}
 
 		body := make([]byte, req.ContentLength)
-		req.Body.Read(body)
+		req.Body.Read(body) //nolint:errcheck
 		if !strings.Contains(string(body), `"state":"closed"`) {
 			t.Errorf("Expected body to contain '\"state\":\"closed\"', got '%s'", string(body))
 		}
