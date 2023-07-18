@@ -73,7 +73,7 @@ func (g *GitHub) CloseIssue(owner string, repo RepoConfigName, issueID IssueID) 
 	return nil
 }
 
-func (g *GitHub) OpenPullRequest(owner, repo, title, body, baseBranch, headBranch string) error {
+func (g *GitHub) OpenPullRequest(owner string, repo RepoConfigName, title, body, baseBranch, headBranch string) error {
 	newPR := &github.NewPullRequest{
 		Title:               github.String(title),
 		Head:                github.String(headBranch),
@@ -82,7 +82,7 @@ func (g *GitHub) OpenPullRequest(owner, repo, title, body, baseBranch, headBranc
 		MaintainerCanModify: github.Bool(true),
 	}
 
-	_, _, err := g.client.PullRequests.Create(context.Background(), owner, repo, newPR)
+	_, _, err := g.client.PullRequests.Create(context.Background(), owner, string(repo), newPR)
 	if err != nil {
 		return err
 	}
