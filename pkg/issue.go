@@ -93,7 +93,7 @@ func OpenPullRequest(issueID IssueID) error {
 		fmt.Sprintf("%v | %v", issue.ID, issue.Name),
 		fmt.Sprintf("Resolves #%v", issue.ID),
 		"master", // TODO: make configurable
-		string(issueID),
+		issue.BranchName,
 	)
 }
 
