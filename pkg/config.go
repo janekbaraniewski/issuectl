@@ -156,3 +156,13 @@ func (ic *IssuectlConfig) GetProfile(profileName ProfileName) *Profile {
 	}
 	return nil
 }
+
+// Backends
+func (ic *IssuectlConfig) GetBackend(backendName BackendConfigName) *BackendConfig {
+	for _, bc := range ic.Backends {
+		if bc.Name == backendName {
+			return &bc
+		}
+	}
+	return nil
+}
