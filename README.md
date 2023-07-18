@@ -61,17 +61,17 @@ With all of this in place you can work on issues
 #### Start
 
 ```bash
-$ issuectl start 15
+> issuectl start 15
 ```
 
 #### Open PR
 
 ```bash
-$ issuectl openpr 15
+> issuectl openpr 15
 ```
 
 #### Finish
 
 ```bash
-$ issuectl finish 15
+> issuectl finish 15
 ```
