@@ -21,10 +21,15 @@ func loadGithubToken() string {
 
 var GitHubToken = loadGithubToken()
 
-func StartWorkingOnIssue(issueID IssueID) error {
+func StartWorkingOnIssue(repositories []string, issueID IssueID) error {
 	config := LoadConfig()
 	profile := config.GetProfile(config.CurrentProfile)
-
+	for _, repoName := range repositories {
+		rc := config.GetRepository(RepoConfigName(repoName))
+		if err := profile.AddRepository(rc); err != nil {
+			return err
+		}
+	}
 	if existing := config.GetIssue(issueID); existing != nil {
 		return fmt.Errorf("issueID already in use")
 	}

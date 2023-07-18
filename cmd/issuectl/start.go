@@ -7,6 +7,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var repoList []string
+
 func initStartCommand(rootCmd *cobra.Command) {
 	startCmd := &cobra.Command{
 		Use:                "start",
@@ -20,7 +22,7 @@ func initStartCommand(rootCmd *cobra.Command) {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := issuectl.StartWorkingOnIssue(issuectl.IssueID(args[0])); err != nil {
+			if err := issuectl.StartWorkingOnIssue(repoList, issuectl.IssueID(args[0])); err != nil {
 				issuectl.Log.Infof("Error!! -> %v", err)
 				return err
 			}
@@ -28,6 +30,14 @@ func initStartCommand(rootCmd *cobra.Command) {
 			return nil
 		},
 	}
+
+	startCmd.PersistentFlags().StringSliceVarP(
+		&repoList,
+		"repos",
+		"r",
+		[]string{},
+		"A list of repositories to clone",
+	)
 
 	rootCmd.AddCommand(startCmd)
 }
