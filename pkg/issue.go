@@ -9,7 +9,7 @@ import (
 func StartWorkingOnIssue(issueID IssueID) error {
 	config := LoadConfig()
 	profile := config.GetProfile(config.CurrentProfile)
-
+	// backendConfig := config.GetBackend(profile.Backend)
 	if existing := config.GetIssue(issueID); existing != nil {
 		return fmt.Errorf("issueID already in use")
 	}
@@ -37,6 +37,7 @@ func StartWorkingOnIssue(issueID IssueID) error {
 		RepoName:    profile.Repository,
 		BackendName: "github",
 		Dir:         issueDirPath,
+		Profile:     profile.Name,
 	}); err != nil {
 		return err
 	}

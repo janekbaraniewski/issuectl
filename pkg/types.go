@@ -43,4 +43,5 @@ type IssueConfig struct {
 	BackendName BackendConfigName `json:"backendName"`
 	RepoName    RepoConfigName    `json:"repoName"`
 	Dir         string            `json:"dir"`
+	Profile     ProfileName       `json:"profile"`
 }
