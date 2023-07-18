@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -72,7 +71,7 @@ func (c *IssuectlConfig) Save() error {
 func LoadConfig() *IssuectlConfig {
 	config := &IssuectlConfig{}
 
-	data, err := ioutil.ReadFile(DefaultConfigFilePath)
+	data, err := os.ReadFile(DefaultConfigFilePath)
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
 			if err := config.Save(); err != nil {
@@ -107,8 +106,7 @@ func (ic *IssuectlConfig) DeleteIssue(issueID IssueID) error {
 			} else {
 				ic.Issues = ic.Issues[:i]
 			}
-			ic.Save()
-			return nil
+			return ic.Save()
 		}
 	}
 	return fmt.Errorf("issue with ID '%s' not found", issueID)
