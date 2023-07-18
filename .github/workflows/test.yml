@@ -23,17 +23,8 @@ jobs:
     - name: Download dependencies
       run: go mod download
 
-    - name: Create gh access token
-      run: |
-        echo "TEST_TOKEN" >> gh-access-token
-        ls -la
-        pwd
-        cat gh-access-token
-
     - name: Run tests
-      run: |
-        ls -la
-        make test
+      run: make test
 
 #   static-analysis:
 #     runs-on: ubuntu-latest
