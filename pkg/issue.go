@@ -23,14 +23,15 @@ var GitHubToken = loadGithubToken()
 
 func StartWorkingOnIssue(repositories []string, issueID IssueID) error {
 	config := LoadConfig()
-	profile := config.GetProfile(config.CurrentProfile)
+	profile := config.GetProfile(config.GetCurrentProfile())
 	for _, repoName := range repositories {
 		rc := config.GetRepository(RepoConfigName(repoName))
-		if err := profile.AddRepository(rc); err != nil {
+		if err := profile.AddRepository(&rc); err != nil {
 			return err
 		}
 	}
-	if existing := config.GetIssue(issueID); existing != nil {
+	emptyIssue := &IssueConfig{}
+	if existing := config.GetIssue(issueID); existing != *emptyIssue {
 		return fmt.Errorf("issueID already in use")
 	}
 
@@ -70,7 +71,7 @@ func StartWorkingOnIssue(repositories []string, issueID IssueID) error {
 		}
 	} else {
 		Log.V(2).Infof("Cloning repo")
-		repoDirPath, err := cloneRepo(repo, issueDirPath)
+		repoDirPath, err := cloneRepo(&repo, issueDirPath)
 		if err != nil {
 			return err
 		}
@@ -98,10 +99,11 @@ func StartWorkingOnIssue(repositories []string, issueID IssueID) error {
 
 func OpenPullRequest(issueID IssueID) error {
 	config := LoadConfig()
-	profile := config.GetProfile(config.CurrentProfile)
+	profile := config.GetProfile(config.GetCurrentProfile())
 
 	issue := config.GetIssue(issueID)
-	if issue == nil {
+	emptyIssue := &IssueConfig{}
+	if issue == *emptyIssue {
 		return fmt.Errorf("issueID not found")
 	}
 	ghClient := NewGitHubClient(GitHubToken)
@@ -119,7 +121,7 @@ func OpenPullRequest(issueID IssueID) error {
 
 func FinishWorkingOnIssue(issueID IssueID) error {
 	config := LoadConfig()
-	profile := config.GetProfile(config.CurrentProfile)
+	profile := config.GetProfile(config.GetCurrentProfile())
 	repo := config.GetRepository(profile.Repository)
 	// Close the issue on GitHub.
 	ghClient := NewGitHubClient(GitHubToken)
