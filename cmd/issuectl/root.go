@@ -7,10 +7,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func RootCmd() *cobra.Command {
+func RootCmd(version string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "issuectl",
-		Short: "issuectl",
+		Use:     "issuectl",
+		Version: version,
+		Short:   "issuectl",
 		Long: `issuectl
 	issuectl
 		issuectl`,
@@ -28,8 +29,8 @@ func RootCmd() *cobra.Command {
 	return cmd
 }
 
-func Execute() {
-	if err := RootCmd().Execute(); err != nil {
+func Execute(version string) {
+	if err := RootCmd(version).Execute(); err != nil {
 		fmt.Fprintf(os.Stderr, "Whoops. There was an error while executing your CLI '%s'", err)
 		os.Exit(1)
 	}

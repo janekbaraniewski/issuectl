@@ -11,6 +11,9 @@ BIN_NAME=issuectl-$(GOOS)-$(GOARCH) # -$(APP_VERSION)
 SHELL = /usr/bin/env bash -o pipefail
 .SHELLFLAGS = -ec
 
+BUILD_LDFLAGS=-ldflags "\
+-X main.BuildVersion=$(APP_VERSION)"
+
 ##@ General
 
 .PHONY: help
@@ -43,4 +46,4 @@ check: lint vet fmt
 
 issuectl: ## Build issuectl binary
 issuectl: $(PKG_SRC) cmd
-	go build -o ${BIN_NAME} cmd/main.go
+	go build $(BUILD_LDFLAGS) -o $(BIN_NAME) cmd/main.go
