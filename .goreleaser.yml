@@ -1,4 +1,3 @@
-# .goreleaser.yml
 project_name: issuectl
 builds:
   - id: issuectl
@@ -16,3 +15,15 @@ archives:
       - issuectl
     format: binary
     name_template: '{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}'
+brews:
+  - name: issuectl
+    ids:
+      - issuectl
+    github:
+      owner: janekbaraniewski
+      name: homebrew-janekbaraniewski
+    folder: Formula
+    homepage: "https://github.com/janekbaraniewski/issuectl"
+    description: "Your application description"
+    test: "system \"#{bin}/issuectl --version\""
+    license: "MIT"
