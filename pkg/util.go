@@ -21,6 +21,11 @@ func cloneRepo(repo *RepoConfig, dir string) (string, error) {
 func createBranch(dir, branchName string) error {
 	cmd := exec.Command("git", "checkout", "-b", branchName)
 	cmd.Dir = dir
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+	cmd = exec.Command("git", "push", "--set-upstream", "origin", branchName)
+	cmd.Dir = dir
 	return cmd.Run()
 }
 

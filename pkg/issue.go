@@ -7,9 +7,19 @@ import (
 )
 
 const (
-	GitHubToken = "GITHUB_TOKEN"
-	GitHubApi   = "https://api.github.com/"
+	GitHubApi = "https://api.github.com/"
 )
+
+func loadGithubToken() string {
+	content, err := os.ReadFile("gh-access-token")
+	if err != nil {
+		Log.Infof("FATAL - no gh access token found")
+		os.Exit(1)
+	}
+	return string(content)
+}
+
+var GitHubToken = loadGithubToken()
 
 func StartWorkingOnIssue(issueID IssueID) error {
 	config := LoadConfig()
