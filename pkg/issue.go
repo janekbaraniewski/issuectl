@@ -40,8 +40,9 @@ func StartWorkingOnIssue(repositories []string, issueID IssueID) error {
 	Log.Infof("Starting work on issue %v ...", issueID)
 
 	repo := config.GetRepository(profile.Repository)
+	backendConfig := config.GetBackend(profile.Backend)
 	issueBackend := GetIssueBackend(&GetBackendConfig{
-		Type:        BackendGithub,
+		Type:        backendConfig.Type,
 		GitHubApi:   GitHubApi,
 		GitHubToken: GitHubToken,
 	})
@@ -112,8 +113,9 @@ func OpenPullRequest(issueID IssueID) error {
 		return fmt.Errorf("issueID not found")
 	}
 
+	backendConfig := config.GetBackend(profile.Backend)
 	repoBackend := GetRepoBackend(&GetBackendConfig{
-		Type:        BackendGithub,
+		Type:        backendConfig.Type,
 		GitHubApi:   GitHubApi,
 		GitHubToken: GitHubToken,
 	})
@@ -132,9 +134,9 @@ func FinishWorkingOnIssue(issueID IssueID) error {
 	config := LoadConfig()
 	profile := config.GetProfile(config.GetCurrentProfile())
 	repo := config.GetRepository(profile.Repository)
-
+	backendConfig := config.GetBackend(profile.Backend)
 	issueBackend := GetIssueBackend(&GetBackendConfig{
-		Type:        BackendGithub,
+		Type:        backendConfig.Type,
 		GitHubToken: GitHubToken,
 		GitHubApi:   GitHubApi,
 	})
