@@ -29,6 +29,9 @@ type RepoConfig struct {
 	// Name of this repo
 	Name RepoConfigName `json:"name"`
 
+	// Repo owner
+	Owner string `json:"owner"`
+
 	// URL to this repo
 	RepoURL RepoURL `json:"url"`
 }

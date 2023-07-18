@@ -6,6 +6,11 @@ import (
 	"path/filepath"
 )
 
+const (
+	GitHubToken = "GITHUB_TOKEN"
+	GitHubApi   = "https://api.github.com/"
+)
+
 func StartWorkingOnIssue(issueID IssueID) error {
 	config := LoadConfig()
 	profile := config.GetProfile(config.CurrentProfile)
@@ -17,8 +22,9 @@ func StartWorkingOnIssue(issueID IssueID) error {
 	Log.Infof("Starting work on issue %v ...", issueID)
 
 	// Check if the issue exists on GitHub.
-	ghClient := NewGitHubClient("TOKEN")
-	exists, err := ghClient.IssueExists(profile.Owner, profile.Repo, string(issueID))
+	ghClient := NewGitHubClient(GitHubToken)
+	repo := config.GetRepository(profile.Repository)
+	exists, err := ghClient.IssueExists(repo.Owner, string(repo.Name), string(issueID))
 	if err != nil || !exists {
 		return fmt.Errorf("issue does not exist on GitHub: %v", err)
 	}
@@ -50,8 +56,8 @@ func StartWorkingOnIssue(issueID IssueID) error {
 	}
 
 	err = ghClient.OpenPullRequest(
-		profile.Owner,
-		profile.Repo,
+		repo.Owner,
+		string(repo.Name),
 		"PR title", // Replace with your PR title.
 		"PR body",  // Replace with your PR body.
 		"master",   // Replace with the base branch name.
@@ -62,35 +68,31 @@ func StartWorkingOnIssue(issueID IssueID) error {
 	}
 
 	err = ghClient.LinkIssueToRepo(
-		profile.BaseURL,
-		profile.Owner,
-		profile.Repo,
+		GitHubApi,
+		repo.Owner,
+		string(repo.Name),
 		string(issueID),
-		"PR number",         // Replace with your PR number.
-		"YOUR_GITHUB_TOKEN", // Replace with your real GitHub token.
+		"PR number", // Replace with your PR number.
+		GitHubToken, // Replace with your real GitHub token.
 	)
 	if err != nil {
 		return fmt.Errorf("failed to link the pull request to the issue: %v", err)
 	}
 
-	return nil
-
 	Log.Infof("Started working on issue %v", issueID)
-
 	return nil
 }
 
 func FinishWorkingOnIssue(issueID IssueID) error {
 	config := LoadConfig()
-
+	profile := config.GetProfile(config.CurrentProfile)
+	repo := config.GetRepository(profile.Repository)
 	// Close the issue on GitHub.
-	ghClient := NewGitHubClient("TOKEN")
+	ghClient := NewGitHubClient(GitHubToken)
 	err := ghClient.CloseIssue(
-		profile.BaseURL,
-		profile.Owner,
-		profile.Repo,
+		repo.Owner,
+		string(repo.Name),
 		string(issueID),
-		"YOUR_GITHUB_TOKEN", // Replace with your real GitHub token.
 	)
 	if err != nil {
 		return fmt.Errorf("failed to close the issue: %v", err)
