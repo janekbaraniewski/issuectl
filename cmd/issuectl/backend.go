@@ -27,8 +27,7 @@ func initBackendListCommand(rootCmd *cobra.Command) {
 		Use:   "list",
 		Short: "List all backends",
 		Run: func(cmd *cobra.Command, args []string) {
-			config := issuectl.LoadConfig()
-			for _, backend := range config.Backends {
+			for _, backend := range issuectl.LoadConfig().GetBackends() {
 				fmt.Println(backend.Name)
 			}
 		},
@@ -42,7 +41,7 @@ func initBackendAddCommand(rootCmd *cobra.Command) {
 		Use:   "add [name] [config]",
 		Short: "Add a new backend",
 		Args:  cobra.ExactArgs(2),
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			config := issuectl.LoadConfig()
 			backendName := args[0]
 			backendType := args[1]
@@ -50,11 +49,7 @@ func initBackendAddCommand(rootCmd *cobra.Command) {
 				Name: issuectl.BackendConfigName(backendName),
 				Type: issuectl.BackendType(backendType),
 			}
-			config.Backends = append(config.Backends, newBackend)
-			if err := config.Save(); err != nil {
-				issuectl.Log.Infof("Failed to save config: %v", err)
-				return
-			}
+			return config.AddBackend(&newBackend)
 		},
 	}
 
@@ -66,19 +61,10 @@ func initBackendDeleteCommand(rootCmd *cobra.Command) {
 		Use:   "delete [name]",
 		Short: "Delete a backend",
 		Args:  cobra.ExactArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			config := issuectl.LoadConfig()
 			backendName := args[0]
-			for i, backend := range config.Backends {
-				if string(backend.Name) == backendName {
-					config.Backends = append(config.Backends[:i], config.Backends[i+1:]...)
-					break
-				}
-			}
-			if err := config.Save(); err != nil {
-				issuectl.Log.Infof("Failed to save config: %v", err)
-				return
-			}
+			return config.DeleteBackend(issuectl.BackendConfigName(backendName))
 		},
 	}
 
@@ -91,19 +77,7 @@ func initBackendUseCommand(rootCmd *cobra.Command) {
 		Short: "Use a backend",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			config := issuectl.LoadConfig()
-			backendName := args[0]
-			for _, backend := range config.Backends {
-				if string(backend.Name) == backendName {
-					// TODO: Set the current backend to the specified backend
-					// This will depend on how you're managing the current backend in your application
-					break
-				}
-			}
-			if err := config.Save(); err != nil {
-				issuectl.Log.Infof("Failed to save config: %v", err)
-				return
-			}
+			// config := issuectl.LoadConfig()
 		},
 	}
 

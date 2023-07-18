@@ -2,7 +2,6 @@ package issuectl
 
 import (
 	"errors"
-	"fmt"
 	"io/fs"
 	"log"
 	"os"
@@ -24,11 +23,11 @@ var DefaultConfigFilePath = getDefaultConfigFilePath()
 
 // IssuectlConfig manages configuration
 type IssuectlConfig struct {
-	CurrentProfile ProfileName     `json:"currentProfile"`
-	Repositories   []RepoConfig    `json:"repositories"`
-	Issues         []IssueConfig   `json:"issues"`
-	Profiles       []Profile       `json:"profiles"`
-	Backends       []BackendConfig `json:"backends"`
+	CurrentProfile ProfileName                         `json:"currentProfile"`
+	Repositories   map[RepoConfigName]RepoConfig       `json:"repositories"`
+	Issues         map[IssueID]IssueConfig             `json:"issues"`
+	Profiles       map[ProfileName]Profile             `json:"profiles"`
+	Backends       map[BackendConfigName]BackendConfig `json:"backends"`
 }
 
 func (c *IssuectlConfig) Save() error {
@@ -81,32 +80,17 @@ func LoadConfig() *IssuectlConfig {
 // Issues
 
 func (ic *IssuectlConfig) AddIssue(issueConfig *IssueConfig) error {
-	ic.Issues = append(ic.Issues, *issueConfig)
+	ic.Issues[issueConfig.ID] = *issueConfig
 	return ic.Save()
 }
 
 func (ic *IssuectlConfig) DeleteIssue(issueID IssueID) error {
-	for i, issueConfig := range ic.Issues {
-		if issueConfig.ID == issueID {
-			if i < len(ic.Issues) {
-				ic.Issues = append(ic.Issues[:i], ic.Issues[i+1:]...)
-			} else {
-				ic.Issues = ic.Issues[:i]
-			}
-			return ic.Save()
-		}
-	}
-	return fmt.Errorf("issue with ID '%s' not found", issueID)
+	delete(ic.Issues, issueID)
+	return ic.Save()
 }
 
-func (ic *IssuectlConfig) GetIssue(issueID IssueID) *IssueConfig {
-	for _, issueConfig := range ic.Issues {
-		if issueConfig.ID == issueID {
-			return &issueConfig
-		}
-	}
-
-	return nil
+func (ic *IssuectlConfig) GetIssue(issueID IssueID) IssueConfig {
+	return ic.Issues[issueID]
 }
 
 // Repositories
@@ -116,55 +100,64 @@ func (ic *IssuectlConfig) ListRepositories() error {
 	return nil
 }
 
-func (ic *IssuectlConfig) GetRepository(name RepoConfigName) *RepoConfig {
-	for _, rc := range ic.Repositories {
-		if rc.Name == name {
-			return &rc
-		}
-	}
-	return nil
+func (ic *IssuectlConfig) GetRepository(name RepoConfigName) RepoConfig {
+	return ic.Repositories[name]
 }
 
 func (ic *IssuectlConfig) AddRepository(repoConfig *RepoConfig) error {
-	ic.Repositories = append(ic.Repositories, *repoConfig)
-	if err := ic.Save(); err != nil {
-		return err
-	}
-	return nil
+	ic.Repositories[repoConfig.Name] = *repoConfig
+	return ic.Save()
 }
 
 // Profiles
 
-func (ic *IssuectlConfig) GetProfile(profileName ProfileName) *Profile {
-	for _, pr := range ic.Profiles {
-		if pr.Name == profileName {
-			return &pr
-		}
-	}
-	return nil
+func (ic *IssuectlConfig) GetProfile(profileName ProfileName) Profile {
+	return ic.Profiles[profileName]
 }
 
 func (ic *IssuectlConfig) AddProfile(profile *Profile) error {
-	ic.Profiles = append(ic.Profiles, *profile)
+	ic.Profiles[profile.Name] = *profile
 	return ic.Save()
 }
 
 func (ic *IssuectlConfig) DeleteProfile(profileName ProfileName) error {
-	for i, profile := range ic.Profiles {
-		if string(profile.Name) == string(profileName) {
-			ic.Profiles = append(ic.Profiles[:i], ic.Profiles[i+1:]...)
-			break
-		}
-	}
+	delete(ic.Profiles, profileName)
+	return ic.Save()
+}
+
+func (ic *IssuectlConfig) GetCurrentProfile() ProfileName {
+	return ic.CurrentProfile
+}
+
+func (ic *IssuectlConfig) UseProfile(profile ProfileName) error {
+	ic.CurrentProfile = profile
+	return ic.Save()
+}
+
+func (ic *IssuectlConfig) GetProfiles() map[ProfileName]Profile {
+	return ic.Profiles
+}
+
+func (ic *IssuectlConfig) UpdateProfile(profile *Profile) error {
+	ic.Profiles[profile.Name] = *profile
 	return ic.Save()
 }
 
 // Backends
-func (ic *IssuectlConfig) GetBackend(backendName BackendConfigName) *BackendConfig {
-	for _, bc := range ic.Backends {
-		if bc.Name == backendName {
-			return &bc
-		}
-	}
-	return nil
+func (ic *IssuectlConfig) GetBackend(backendName BackendConfigName) BackendConfig {
+	return ic.Backends[backendName]
+}
+
+func (ic *IssuectlConfig) AddBackend(backend *BackendConfig) error {
+	ic.Backends[backend.Name] = *backend
+	return ic.Save()
+}
+
+func (ic *IssuectlConfig) DeleteBackend(backendName BackendConfigName) error {
+	delete(ic.Backends, backendName)
+	return ic.Save()
+}
+
+func (ic *IssuectlConfig) GetBackends() map[BackendConfigName]BackendConfig {
+	return ic.Backends
 }
