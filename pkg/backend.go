@@ -12,8 +12,9 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func getIssueNumberFromString(issueID string) (int, error) {
-	issueNumber, err := strconv.Atoi(issueID)
+// getIssueNumberFromString converts IssueID to int
+func getIssueNumberFromString(issueID IssueID) (int, error) {
+	issueNumber, err := strconv.Atoi(string(issueID))
 	if err != nil {
 		return 0, fmt.Errorf("invalid issue ID: %v", err)
 	}
@@ -22,10 +23,10 @@ func getIssueNumberFromString(issueID string) (int, error) {
 }
 
 type IssueBackend interface {
-	IssueExists(owner, repo, issueID string) (bool, error)
-	LinkIssueToRepo(owner, repo, issueID, pullRequestID string) error
-	CloseIssue(owner, repo, issueID string) error
-	OpenPullRequest(owner, repo, title, body, baseBranch, headBranch string) error
+	IssueExists(owner string, repo RepoConfigName, issueID IssueID) (bool, error)
+	LinkIssueToRepo(owner string, repo RepoConfigName, issueID IssueID, pullRequestID string) error
+	CloseIssue(owner string, repo RepoConfigName, issueID IssueID) error
+	OpenPullRequest(owner string, repo RepoConfigName, title, body, baseBranch, headBranch string) error
 }
 
 type GitHub struct {
@@ -43,7 +44,7 @@ func NewGitHubClient(token string) *GitHub {
 	return &GitHub{client: client}
 }
 
-func (g *GitHub) IssueExists(owner, repo, issueID string) (bool, error) {
+func (g *GitHub) IssueExists(owner, repo string, issueID IssueID) (bool, error) {
 	issueNumber, err := getIssueNumberFromString(issueID)
 	if err != nil {
 		return false, err
@@ -57,7 +58,7 @@ func (g *GitHub) IssueExists(owner, repo, issueID string) (bool, error) {
 	return true, nil
 }
 
-func (g *GitHub) CloseIssue(owner, repo, issueID string) error {
+func (g *GitHub) CloseIssue(owner, repo string, issueID IssueID) error {
 	issueNumber, err := getIssueNumberFromString(issueID)
 	if err != nil {
 		return err
