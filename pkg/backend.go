@@ -57,7 +57,7 @@ func (g *GitHub) IssueExists(owner, repo, issueID string) (bool, error) {
 	return true, nil
 }
 
-func (g *GitHub) CloseIssue(owner, repo, issueID, token string) error {
+func (g *GitHub) CloseIssue(owner, repo, issueID string) error {
 	issueNumber, err := getIssueNumberFromString(issueID)
 	if err != nil {
 		return err
@@ -72,7 +72,7 @@ func (g *GitHub) CloseIssue(owner, repo, issueID, token string) error {
 	return nil
 }
 
-func (g *GitHub) OpenPullRequest(owner, repo, title, body, baseBranch, headBranch, token string) error {
+func (g *GitHub) OpenPullRequest(owner, repo, title, body, baseBranch, headBranch string) error {
 	newPR := &github.NewPullRequest{
 		Title:               github.String(title),
 		Head:                github.String(headBranch),

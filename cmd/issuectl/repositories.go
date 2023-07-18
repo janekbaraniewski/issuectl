@@ -29,16 +29,17 @@ func initRepoAddCommand(rootCmd *cobra.Command) {
 		Long:               "",
 		FParseErrWhitelist: cobra.FParseErrWhitelist{UnknownFlags: true},
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) < 2 || len(args) > 2 {
-				return errors.New("you must provide exactly 2 arguments - name and url of repository")
+			if len(args) < 3 || len(args) > 3 {
+				return errors.New("you must provide exactly 3 arguments - owner, name and url of repository")
 			}
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			conf := issuectl.LoadConfig()
 			repoConfig := &issuectl.RepoConfig{
-				Name:    issuectl.RepoConfigName(args[0]),
-				RepoURL: issuectl.RepoURL(args[1]),
+				Owner:   args[0],
+				Name:    issuectl.RepoConfigName(args[1]),
+				RepoURL: issuectl.RepoURL(args[2]),
 			}
 			return conf.AddRepository(repoConfig)
 		},
