@@ -24,7 +24,11 @@ jobs:
       run: go mod download
 
     - name: Create gh access token
-      run: echo "TEST_TOKEN" >> gh-access-token
+      run: |
+        echo "TEST_TOKEN" >> gh-access-token
+        ls -la
+        pwd
+        cat gh-access-token
 
     - name: Run tests
       run: make test
