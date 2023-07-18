@@ -11,7 +11,7 @@ import (
 // and returns the path of the new repository directory and any error encountered.
 func cloneRepo(repo *RepoConfig, dir string) (string, error) {
 	repoDir := filepath.Join(dir, string(repo.Name))
-	cmd := exec.Command("git", "clone", string(repo.RepoUrl), repoDir)
+	cmd := exec.Command("git", "clone", string(repo.RepoURL), repoDir)
 	return repoDir, cmd.Run()
 }
 
