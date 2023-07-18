@@ -10,14 +10,20 @@ type GitLab struct {
 	client *gitlab.Client
 }
 
-func NewGitLabClient(token, baseURL string) (*GitLab, error) {
+func NewGitLabClient(token, baseURL string) *GitLab {
 	Log.Infof("NOT TESTED")
 	client, err := gitlab.NewClient(token, gitlab.WithBaseURL(baseURL))
 	if err != nil {
-		return nil, fmt.Errorf("failed to create GitLab client: %v", err)
+		Log.Infof("failed to create GitLab client: %v", err)
+		return nil
 	}
 
-	return &GitLab{client: client}, nil
+	return &GitLab{client: client}
+}
+
+func (g *GitLab) GetIssue(owner string, repo RepoConfigName, issueID IssueID) (interface{}, error) {
+	Log.Infof("NOT IMPLEMENTED")
+	return nil, nil
 }
 
 func (g *GitLab) IssueExists(owner string, repo RepoConfigName, issueID IssueID) (bool, error) {

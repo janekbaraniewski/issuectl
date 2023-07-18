@@ -4,7 +4,10 @@ package issuectl
 type BackendType string
 
 // BackendGithub is a BackendType for GitHub
-const BackendGithub BackendType = "github"
+const (
+	BackendGithub BackendType = "github"
+	BackendGitLab BackendType = "gitlab"
+)
 
 // BackendConfigName is a name of instance of BackendConfig
 type BackendConfigName string
