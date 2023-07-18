@@ -5,6 +5,7 @@ import (
 
 	issuectl "github.com/janekbaraniewski/issuectl/pkg"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
 )
 
 func initConfigCommand(rootCmd *cobra.Command) {
@@ -23,6 +24,15 @@ func initPrintConfigCommand(root *cobra.Command) {
 		Use:   "get",
 		Short: "Get config",
 		Long:  `Prints full currently sellected config`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			config := issuectl.LoadConfig()
+			confYaml, err := yaml.Marshal(config)
+			if err != nil {
+				return err
+			}
+			fmt.Printf("%v", string(confYaml))
+			return nil
+		},
 	}
 	root.AddCommand(getConfigCmd)
 }
