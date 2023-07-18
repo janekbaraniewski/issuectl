@@ -1,0 +1,18 @@
+# .goreleaser.yml
+project_name: issuectl
+builds:
+  - id: issuectl
+    main: ./cmd/main.go
+    binary: issuectl
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+archives:
+  - id: issuectl
+    builds:
+      - issuectl
+    format: binary
+    name_template: '{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}'
