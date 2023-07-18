@@ -42,22 +42,18 @@ func initProfileAddCommand(rootCmd *cobra.Command) {
 		Use:   "add [name] [workdir] [defaultrepository]",
 		Short: "Add a new profile",
 		Args:  cobra.ExactArgs(3),
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			config := issuectl.LoadConfig()
 			profileName := args[0]
 			workDir := args[1]
 			defaultRepository := args[2]
-			newProfile := issuectl.Profile{
+			newProfile := &issuectl.Profile{
 				Name:       issuectl.ProfileName(profileName),
 				WorkDir:    workDir,
 				Repository: issuectl.RepoConfigName(defaultRepository),
 				Backend:    "github",
 			}
-			config.Profiles = append(config.Profiles, newProfile)
-			if err := config.Save(); err != nil {
-				issuectl.Log.Infof("Failed to save config: %v", err)
-				return
-			}
+			return config.AddProfile(newProfile)
 		},
 	}
 
