@@ -68,9 +68,6 @@ func (g *GitLab) OpenPullRequest(owner string, repo RepoConfigName, title, body,
 }
 
 func (g *GitLab) LinkIssueToRepo(owner string, repo RepoConfigName, issueID IssueID, pullRequestID string) error {
-	// GitLab has a different system to link issues with merge requests.
-	// You might have to adjust this depending on how you want the issues and merge requests to be linked.
-
 	issueNumber, err := getIssueNumberFromString(issueID)
 	if err != nil {
 		return err
