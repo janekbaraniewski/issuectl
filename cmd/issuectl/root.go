@@ -24,6 +24,7 @@ func RootCmd() *cobra.Command {
 	initRepositoriesCommand(cmd)
 	initProfileCommand(cmd)
 	initBackendCommand(cmd)
+	initOpenPullRequestCommand(cmd)
 	return cmd
 }
 
