@@ -18,8 +18,8 @@ type IssueBackend interface {
 type GitHub struct{}
 
 // IssueExists checks if an issue with the given ID exists in the specified GitHub repository.
-func (g *GitHub) IssueExists(owner, repo, issueID string) (bool, error) {
-	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/issues/%s", owner, repo, issueID)
+func (g *GitHub) IssueExists(baseURL, owner, repo, issueID string) (bool, error) {
+	url := fmt.Sprintf("%s/repos/%s/%s/issues/%s", baseURL, owner, repo, issueID)
 	resp, err := http.Get(url)
 	if err != nil {
 		return false, err
@@ -30,8 +30,8 @@ func (g *GitHub) IssueExists(owner, repo, issueID string) (bool, error) {
 }
 
 // LinkIssueToRepo links a pull request to an issue in the specified GitHub repository.
-func (g *GitHub) LinkIssueToRepo(owner, repo, issueID, pullRequestID, token string) error {
-	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/issues/%s/timeline", owner, repo, issueID)
+func (g *GitHub) LinkIssueToRepo(baseURL, owner, repo, issueID, pullRequestID, token string) error {
+	url := fmt.Sprintf("%s/repos/%s/%s/issues/%s/timeline", baseURL, owner, repo, issueID)
 	body := map[string]string{
 		"issue_number": pullRequestID,
 	}
@@ -61,8 +61,8 @@ func (g *GitHub) LinkIssueToRepo(owner, repo, issueID, pullRequestID, token stri
 }
 
 // CloseIssue closes an issue in the specified GitHub repository.
-func (g *GitHub) CloseIssue(owner, repo, issueID, token string) error {
-	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/issues/%s", owner, repo, issueID)
+func (g *GitHub) CloseIssue(baseURL, owner, repo, issueID, token string) error {
+	url := fmt.Sprintf("%s/repos/%s/%s/issues/%s", baseURL, owner, repo, issueID)
 	body := map[string]string{
 		"state": "closed",
 	}
