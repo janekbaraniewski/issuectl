@@ -8,6 +8,7 @@ import (
 
 func StartWorkingOnIssue(issueID IssueID) error {
 	config := LoadConfig()
+	profile := config.GetProfile(config.CurrentProfile)
 
 	if existing := config.GetIssue(issueID); existing != nil {
 		return fmt.Errorf("issueID already in use")
@@ -15,7 +16,7 @@ func StartWorkingOnIssue(issueID IssueID) error {
 
 	Log.Infof("Starting work on issue %v ...", issueID)
 	Log.V(2).Infof("Creating issue work dir")
-	issueDirPath, err := createDirectory(config.WorkDir, string(issueID))
+	issueDirPath, err := createDirectory(profile.WorkDir, string(issueID))
 	if err != nil {
 		return err
 	}
@@ -33,7 +34,7 @@ func StartWorkingOnIssue(issueID IssueID) error {
 	if err := config.AddIssue(&IssueConfig{
 		Name:        string(issueID),
 		ID:          issueID,
-		RepoName:    config.DefaultRepository,
+		RepoName:    profile.Repository,
 		BackendName: "github",
 		Dir:         issueDirPath,
 	}); err != nil {
