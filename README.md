@@ -1,5 +1,8 @@
 # issuectl
 
+> # WARNING
+> this is still work in progress.
+
 `issuectl`:
 
 - gives you clean isolated space for each of your issues
