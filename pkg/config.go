@@ -35,13 +35,11 @@ type Profile struct {
 
 // IssuectlConfig manages configuration
 type IssuectlConfig struct {
-	CurrentProfile    ProfileName     `json:"currentProfile"`
-	WorkDir           string          `json:"workDir"`
-	DefaultRepository RepoConfigName  `json:"defaultRepository"`
-	Repositories      []RepoConfig    `json:"repositories"`
-	Issues            []IssueConfig   `json:"issues"`
-	Profiles          []Profile       `json:"profiles"`
-	Backends          []BackendConfig `json:"backends"`
+	CurrentProfile ProfileName     `json:"currentProfile"`
+	Repositories   []RepoConfig    `json:"repositories"`
+	Issues         []IssueConfig   `json:"issues"`
+	Profiles       []Profile       `json:"profiles"`
+	Backends       []BackendConfig `json:"backends"`
 }
 
 func (c *IssuectlConfig) Save() error {
@@ -142,6 +140,17 @@ func (ic *IssuectlConfig) AddRepository(repoConfig *RepoConfig) error {
 	ic.Repositories = append(ic.Repositories, *repoConfig)
 	if err := ic.Save(); err != nil {
 		return err
+	}
+	return nil
+}
+
+// Profiles
+
+func (ic *IssuectlConfig) GetProfile(profileName ProfileName) *Profile {
+	for _, prof := range ic.Profiles {
+		if prof.Name == profileName {
+			return &prof
+		}
 	}
 	return nil
 }

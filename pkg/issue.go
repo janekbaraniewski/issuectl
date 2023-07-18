@@ -15,7 +15,8 @@ func StartWorkingOnIssue(issueID IssueID) error {
 
 	Log.Infof("Starting work on issue %v ...", issueID)
 	Log.V(2).Infof("Creating issue work dir")
-	issueDirPath, err := createDirectory(config.WorkDir, string(issueID))
+	profile := config.GetProfile(config.CurrentProfile)
+	issueDirPath, err := createDirectory(profile.WorkDir, string(issueID))
 	if err != nil {
 		return err
 	}
@@ -33,7 +34,7 @@ func StartWorkingOnIssue(issueID IssueID) error {
 	if err := config.AddIssue(&IssueConfig{
 		Name:        string(issueID),
 		ID:          issueID,
-		RepoName:    config.DefaultRepository,
+		RepoName:    profile.Repository,
 		BackendName: "github",
 		Dir:         issueDirPath,
 	}); err != nil {
@@ -47,9 +48,9 @@ func StartWorkingOnIssue(issueID IssueID) error {
 
 func FinishWorkingOnIssue(issueID IssueID) error {
 	config := LoadConfig()
-
+	profile := config.GetProfile(config.CurrentProfile)
 	Log.Infof("Cleaning up after work on issue %v", issueID)
-	if err := os.RemoveAll(filepath.Join(config.WorkDir, string(issueID))); err != nil {
+	if err := os.RemoveAll(filepath.Join(profile.WorkDir, string(issueID))); err != nil {
 		return err
 	}
 
