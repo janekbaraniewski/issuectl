@@ -24,3 +24,7 @@ type IssueBackend interface {
 type RepositoryBackend interface {
 	OpenPullRequest(owner string, repo RepoConfigName, title, body, baseBranch, headBranch string) error
 }
+
+var IssueBackends []IssueBackend = []IssueBackend{
+	NewGitHubClient(GitHubToken, GitHubApi),
+}

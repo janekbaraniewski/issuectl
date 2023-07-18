@@ -38,9 +38,9 @@ func StartWorkingOnIssue(repositories []string, issueID IssueID) error {
 	Log.Infof("Starting work on issue %v ...", issueID)
 
 	// Check if the issue exists on GitHub.
-	ghClient := NewGitHubClient(GitHubToken)
+	ghClient := NewGitHubClient(GitHubToken, GitHubApi)
 	repo := config.GetRepository(profile.Repository)
-	exists, err := ghClient.IssueExists(repo.Owner, string(repo.Name), issueID)
+	exists, err := ghClient.IssueExists(repo.Owner, repo.Name, issueID)
 	if err != nil || !exists {
 		return fmt.Errorf("issue does not exist on GitHub: %v", err)
 	}
@@ -106,9 +106,8 @@ func OpenPullRequest(issueID IssueID) error {
 	if issue == *emptyIssue {
 		return fmt.Errorf("issueID not found")
 	}
-	ghClient := NewGitHubClient(GitHubToken)
+	ghClient := NewGitHubClient(GitHubToken, GitHubApi)
 	repo := config.GetRepository(profile.Repository)
-
 	return ghClient.OpenPullRequest(
 		repo.Owner,
 		string(repo.Name),
@@ -124,10 +123,10 @@ func FinishWorkingOnIssue(issueID IssueID) error {
 	profile := config.GetProfile(config.GetCurrentProfile())
 	repo := config.GetRepository(profile.Repository)
 	// Close the issue on GitHub.
-	ghClient := NewGitHubClient(GitHubToken)
+	ghClient := NewGitHubClient(GitHubToken, GitHubApi)
 	err := ghClient.CloseIssue(
 		repo.Owner,
-		string(repo.Name),
+		repo.Name,
 		issueID,
 	)
 	if err != nil {
