@@ -38,7 +38,7 @@ func initRepoAddCommand(rootCmd *cobra.Command) {
 			conf := issuectl.LoadConfig()
 			repoConfig := &issuectl.RepoConfig{
 				Name:    issuectl.RepoConfigName(args[0]),
-				RepoUrl: issuectl.RepoUrl(args[1]),
+				RepoURL: issuectl.RepoURL(args[1]),
 			}
 			return conf.AddRepository(repoConfig)
 		},

@@ -18,8 +18,8 @@ type BackendConfig struct {
 	Type BackendType `json:"backendType"`
 }
 
-// RepoUrl is a string with URL to git repo for cloning
-type RepoUrl string
+// RepoURL is a string with URL to git repo for cloning
+type RepoURL string
 
 // RepoConfigName is a name of git repo
 type RepoConfigName string
@@ -30,7 +30,7 @@ type RepoConfig struct {
 	Name RepoConfigName `json:"name"`
 
 	// URL to this repo
-	RepoUrl RepoUrl `json:"url"`
+	RepoURL RepoURL `json:"url"`
 }
 
 // IssueID is a unique ID of issue in IssueBackend
