@@ -15,6 +15,9 @@ On macOS:
 
 ## Usage
 
+Basic idea of workflow and what systems this can interact with at each step
+![](diagram.png)
+
 ### Repositories
 
 In order to work on code you need to define your repositories:
