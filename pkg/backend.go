@@ -32,15 +32,12 @@ type GitHub struct {
 	client *github.Client
 }
 
-func NewGitHubClient(httpTransport http.RoundTripper, token string) *GitHub {
+func NewGitHubClient(token string) *GitHub {
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
 	)
 	tc := oauth2.NewClient(ctx, ts)
-
-	// set httpmock as transport
-	tc.Transport = httpTransport
 
 	client := github.NewClient(tc)
 	return &GitHub{client: client}
