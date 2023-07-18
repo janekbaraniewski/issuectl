@@ -22,8 +22,6 @@ func RootCmd(version string) *cobra.Command {
 
 	initStartCommand(cmd)
 	initFinishCommand(cmd)
-	initRepositoriesCommand(cmd)
-	initProfileCommand(cmd)
 	initOpenPullRequestCommand(cmd)
 	initConfigCommand(cmd)
 	return cmd
