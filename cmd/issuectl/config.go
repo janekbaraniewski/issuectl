@@ -7,6 +7,26 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func initConfigCommand(rootCmd *cobra.Command) {
+	configCmd := &cobra.Command{
+		Use:   "config",
+		Short: "Manage config",
+		Long:  `Manage issuectl config.`,
+	}
+	initPrintConfigCommand(configCmd)
+	initBackendCommand(configCmd)
+	rootCmd.AddCommand(configCmd)
+}
+
+func initPrintConfigCommand(root *cobra.Command) {
+	getConfigCmd := &cobra.Command{
+		Use:   "get",
+		Short: "Get config",
+		Long:  `Prints full currently sellected config`,
+	}
+	root.AddCommand(getConfigCmd)
+}
+
 func initBackendCommand(rootCmd *cobra.Command) {
 	backendCmd := &cobra.Command{
 		Use:   "backend",
