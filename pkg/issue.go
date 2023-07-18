@@ -3,6 +3,7 @@ package issuectl
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 const (
@@ -48,20 +49,22 @@ func StartWorkingOnIssue(issueID IssueID) error {
 		return err
 	}
 
-	Log.V(2).Infof("Creating branch")
-	if err := createBranch(repoDirPath, string(issueID)); err != nil {
-		return err
-	}
-
 	issue, err := ghClient.GetIssue(repo.Owner, string(repo.Name), issueID)
 	if err != nil {
 		return fmt.Errorf("failed to get the issue: %v", err)
+	}
+
+	Log.V(2).Infof("Creating branch")
+	branchName := fmt.Sprintf("%v-%v", issueID, strings.ReplaceAll(*issue.Title, " ", "-"))
+	if err := createBranch(repoDirPath, branchName); err != nil {
+		return err
 	}
 
 	if err := config.AddIssue(&IssueConfig{
 		Name:        *issue.Title,
 		ID:          issueID,
 		RepoName:    profile.Repository,
+		BranchName:  branchName,
 		BackendName: "github",
 		Dir:         issueDirPath,
 		Profile:     profile.Name,
