@@ -3,7 +3,6 @@ package issuectl
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 )
 
 const (
@@ -121,7 +120,9 @@ func FinishWorkingOnIssue(issueID IssueID) error {
 
 	Log.Infof("Cleaning up after work on issue %v", issueID)
 
-	if err := os.RemoveAll(filepath.Join(config.WorkDir, string(issueID))); err != nil {
+	issue := config.GetIssue(issueID)
+
+	if err := os.RemoveAll(issue.Dir); err != nil {
 		return err
 	}
 
