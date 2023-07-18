@@ -33,7 +33,7 @@ func StartWorkingOnIssue(issueID IssueID) error {
 	// Check if the issue exists on GitHub.
 	ghClient := NewGitHubClient(GitHubToken)
 	repo := config.GetRepository(profile.Repository)
-	exists, err := ghClient.IssueExists(repo.Owner, string(repo.Name), string(issueID))
+	exists, err := ghClient.IssueExists(repo.Owner, string(repo.Name), issueID)
 	if err != nil || !exists {
 		return fmt.Errorf("issue does not exist on GitHub: %v", err)
 	}
@@ -112,7 +112,7 @@ func FinishWorkingOnIssue(issueID IssueID) error {
 	err := ghClient.CloseIssue(
 		repo.Owner,
 		string(repo.Name),
-		string(issueID),
+		issueID,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to close the issue: %v", err)
