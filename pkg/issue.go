@@ -14,7 +14,7 @@ func loadGithubToken() string {
 	content, err := os.ReadFile("gh-access-token")
 	if err != nil {
 		Log.Infof("FATAL - no gh access token found")
-		os.Exit(1)
+		return ""
 	}
 	return string(content)
 }
