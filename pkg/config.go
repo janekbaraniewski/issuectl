@@ -4,11 +4,21 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 
 	"gopkg.in/yaml.v2"
 )
 
-var configFilePath = "/Users/janbaraniewski/.issuerc" // FIXME
+func getDefaultConfigFilePath() string {
+	dirname, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return filepath.Join(dirname, ".issuerc")
+}
+
+var DefaultConfigFilePath = getDefaultConfigFilePath()
 
 // ProfileName is a name of issuectl config profile
 type ProfileName string
@@ -39,7 +49,7 @@ func (c *IssuectlConfig) Save() error {
 	}
 
 	file, err := os.OpenFile(
-		configFilePath,
+		DefaultConfigFilePath,
 		os.O_TRUNC|os.O_CREATE|os.O_WRONLY,
 		0644,
 	)
@@ -59,7 +69,7 @@ func (c *IssuectlConfig) Save() error {
 func LoadConfig() *IssuectlConfig {
 	config := &IssuectlConfig{}
 
-	data, err := ioutil.ReadFile(configFilePath)
+	data, err := ioutil.ReadFile(DefaultConfigFilePath)
 	if err != nil {
 		Log.Infof("%v", err)
 		return nil
