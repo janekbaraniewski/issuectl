@@ -43,21 +43,36 @@ func StartWorkingOnIssue(issueID IssueID) error {
 	if err != nil {
 		return err
 	}
-	Log.V(2).Infof("Cloning repo")
-	repoDirPath, err := cloneRepo(repo, issueDirPath)
-	if err != nil {
-		return err
-	}
 
 	issue, err := ghClient.GetIssue(repo.Owner, string(repo.Name), issueID)
 	if err != nil {
 		return fmt.Errorf("failed to get the issue: %v", err)
 	}
-
-	Log.V(2).Infof("Creating branch")
 	branchName := fmt.Sprintf("%v-%v", issueID, strings.ReplaceAll(*issue.Title, " ", "-"))
-	if err := createBranch(repoDirPath, branchName); err != nil {
-		return err
+
+	if profile.Repositories != nil {
+		Log.Infof("Cloning multiple repositories: %v", profile.Repositories)
+		for _, repo := range profile.Repositories {
+			Log.Infof("Cloning repo %v", repo.Name)
+			repoDirPath, err := cloneRepo(repo, issueDirPath)
+			if err != nil {
+				return err
+			}
+			Log.V(2).Infof("Creating branch")
+			if err := createBranch(repoDirPath, branchName); err != nil {
+				return err
+			}
+		}
+	} else {
+		Log.V(2).Infof("Cloning repo")
+		repoDirPath, err := cloneRepo(repo, issueDirPath)
+		if err != nil {
+			return err
+		}
+		Log.V(2).Infof("Creating branch")
+		if err := createBranch(repoDirPath, branchName); err != nil {
+			return err
+		}
 	}
 
 	if err := config.AddIssue(&IssueConfig{

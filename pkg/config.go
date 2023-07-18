@@ -22,17 +22,6 @@ func getDefaultConfigFilePath() string {
 
 var DefaultConfigFilePath = getDefaultConfigFilePath()
 
-// ProfileName is a name of issuectl config profile
-type ProfileName string
-
-// Profile is a config profile
-type Profile struct {
-	Name       ProfileName       `json:"name"`
-	WorkDir    string            `json:"workDir"`
-	Repository RepoConfigName    `json:"repository"`
-	Backend    BackendConfigName `json:"backend"`
-}
-
 // IssuectlConfig manages configuration
 type IssuectlConfig struct {
 	CurrentProfile    ProfileName     `json:"currentProfile"`
