@@ -144,6 +144,11 @@ func (ic *IssuectlConfig) GetProfile(profileName ProfileName) *Profile {
 	return nil
 }
 
+func (ic *IssuectlConfig) AddProfile(profile *Profile) error {
+	ic.Profiles = append(ic.Profiles, *profile)
+	return ic.Save()
+}
+
 // Backends
 func (ic *IssuectlConfig) GetBackend(backendName BackendConfigName) *BackendConfig {
 	for _, bc := range ic.Backends {
