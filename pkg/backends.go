@@ -26,14 +26,6 @@ type RepositoryBackend interface {
 	OpenPullRequest(owner string, repo RepoConfigName, title, body, baseBranch, headBranch string) error
 }
 
-var IssueBackends map[BackendType]IssueBackend = map[BackendType]IssueBackend{
-	BackendGithub: NewGitHubClient(GitHubToken, GitHubApi),
-}
-
-var RepositoryBackends map[BackendType]RepositoryBackend = map[BackendType]RepositoryBackend{
-	BackendGithub: NewGitHubClient(GitHubToken, GitHubApi),
-}
-
 type GetBackendConfig struct {
 	Type        BackendType
 	GitHubToken string
