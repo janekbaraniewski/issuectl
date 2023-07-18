@@ -31,7 +31,9 @@ jobs:
         cat gh-access-token
 
     - name: Run tests
-      run: make test
+      run: |
+        ls -la
+        make test
 
 #   static-analysis:
 #     runs-on: ubuntu-latest
