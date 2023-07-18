@@ -149,6 +149,16 @@ func (ic *IssuectlConfig) AddProfile(profile *Profile) error {
 	return ic.Save()
 }
 
+func (ic *IssuectlConfig) DeleteProfile(profileName ProfileName) error {
+	for i, profile := range ic.Profiles {
+		if string(profile.Name) == string(profileName) {
+			ic.Profiles = append(ic.Profiles[:i], ic.Profiles[i+1:]...)
+			break
+		}
+	}
+	return ic.Save()
+}
+
 // Backends
 func (ic *IssuectlConfig) GetBackend(backendName BackendConfigName) *BackendConfig {
 	for _, bc := range ic.Backends {

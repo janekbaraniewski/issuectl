@@ -65,19 +65,10 @@ func initProfileDeleteCommand(rootCmd *cobra.Command) {
 		Use:   "delete [name]",
 		Short: "Delete a profile",
 		Args:  cobra.ExactArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			config := issuectl.LoadConfig()
 			profileName := args[0]
-			for i, profile := range config.Profiles {
-				if string(profile.Name) == profileName {
-					config.Profiles = append(config.Profiles[:i], config.Profiles[i+1:]...)
-					break
-				}
-			}
-			if err := config.Save(); err != nil {
-				issuectl.Log.Infof("Failed to save config: %v", err)
-				return
-			}
+			return config.DeleteProfile(issuectl.ProfileName(profileName))
 		},
 	}
 
