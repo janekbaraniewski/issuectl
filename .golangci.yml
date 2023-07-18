@@ -1,0 +1,10 @@
+linters:
+  enable-all: false
+linters-settings:
+  godox:
+    keywords:
+      - NOTE
+      - OPTIMIZE # marks code that should be optimized before merging
+      - HACK # marks hack-around that should be removed before merging
+  lll:
+    line-length: 130

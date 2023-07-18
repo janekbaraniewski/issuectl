@@ -33,7 +33,7 @@ vet: ## Run go vet against code.
 
 .PHONY: lint
 lint:
-	golangci-lint run
+	golangci-lint run -c .golangci.yml
 
 .PHONY: check
 check: ## Run all static checks
