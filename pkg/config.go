@@ -15,19 +15,21 @@ type ProfileName string
 
 // Profile is a config profile
 type Profile struct {
-	Name              ProfileName    `json:"name"`
-	WorkDir           string         `json:"workDir"`
-	DefaultRepository RepoConfigName `json:"defaultRepository"`
+	Name       ProfileName       `json:"name"`
+	WorkDir    string            `json:"workDir"`
+	Repository RepoConfigName    `json:"repository"`
+	Backend    BackendConfigName `json:"backend"`
 }
 
 // IssuectlConfig manages configuration
 type IssuectlConfig struct {
-	CurrentProfile    ProfileName    `json:"currentProfile"`
-	WorkDir           string         `json:"workDir"`
-	DefaultRepository RepoConfigName `json:"defaultRepository"`
-	Repositories      []RepoConfig   `json:"repositories"`
-	Issues            []IssueConfig  `json:"issues"`
-	Profiles          []Profile      `json:"profiles"`
+	CurrentProfile    ProfileName     `json:"currentProfile"`
+	WorkDir           string          `json:"workDir"`
+	DefaultRepository RepoConfigName  `json:"defaultRepository"`
+	Repositories      []RepoConfig    `json:"repositories"`
+	Issues            []IssueConfig   `json:"issues"`
+	Profiles          []Profile       `json:"profiles"`
+	Backends          []BackendConfig `json:"backends"`
 }
 
 func (c *IssuectlConfig) Save() error {

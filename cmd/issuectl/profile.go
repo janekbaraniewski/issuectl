@@ -48,9 +48,10 @@ func initProfileAddCommand(rootCmd *cobra.Command) {
 			workDir := args[1]
 			defaultRepository := args[2]
 			newProfile := issuectl.Profile{
-				Name:              issuectl.ProfileName(profileName),
-				WorkDir:           workDir,
-				DefaultRepository: issuectl.RepoConfigName(defaultRepository),
+				Name:       issuectl.ProfileName(profileName),
+				WorkDir:    workDir,
+				Repository: issuectl.RepoConfigName(defaultRepository),
+				Backend:    "github",
 			}
 			config.Profiles = append(config.Profiles, newProfile)
 			if err := config.Save(); err != nil {
