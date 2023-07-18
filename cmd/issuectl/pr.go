@@ -7,10 +7,10 @@ import (
 
 func initOpenPullRequestCommand(rootCmd *cobra.Command) {
 	openPRCmd := &cobra.Command{
-		Use:   "openpr",
+		Use:   "openpr [issue number]",
 		Short: "Opens a pull request for the specified issue",
-		Long:  "This command opens a pull request for the specified issue on GitHub",
-		Args:  cobra.ExactArgs(1), // it requires exactly one argument
+		Long:  `This command opens a pull request for the specified issue on GitHub`, // FIXME: Github??
+		Args:  cobra.ExactArgs(1),                                                    // it requires exactly one argument
 		RunE: func(cmd *cobra.Command, args []string) error {
 			issueID := args[0] // the first argument is the issue ID
 			err := issuectl.OpenPullRequest(issuectl.IssueID(issueID))
