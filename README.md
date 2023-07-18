@@ -40,6 +40,14 @@ Once you've set all of this up, you can create your default profile:
 > issuectl use default
 ```
 
+This will create a profile which will clone `repoName` for each issue. You might want to clone multiple repositories, depending on your environment. For this, run
+
+```bash
+> issuectl profile addRepo repoName
+```
+
+This will add `repoName` to your profile and clone it when starting work on new issue.
+
 ### Issues
 
 With all of this in place you can work on issues
