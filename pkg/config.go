@@ -24,13 +24,11 @@ var DefaultConfigFilePath = getDefaultConfigFilePath()
 
 // IssuectlConfig manages configuration
 type IssuectlConfig struct {
-	CurrentProfile    ProfileName     `json:"currentProfile"`
-	WorkDir           string          `json:"workDir"`
-	DefaultRepository RepoConfigName  `json:"defaultRepository"`
-	Repositories      []RepoConfig    `json:"repositories"`
-	Issues            []IssueConfig   `json:"issues"`
-	Profiles          []Profile       `json:"profiles"`
-	Backends          []BackendConfig `json:"backends"`
+	CurrentProfile ProfileName     `json:"currentProfile"`
+	Repositories   []RepoConfig    `json:"repositories"`
+	Issues         []IssueConfig   `json:"issues"`
+	Profiles       []Profile       `json:"profiles"`
+	Backends       []BackendConfig `json:"backends"`
 }
 
 func (c *IssuectlConfig) Save() error {

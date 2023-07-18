@@ -9,9 +9,7 @@ import (
 
 func TestIssuectlConfig_Save(t *testing.T) {
 	config := &IssuectlConfig{
-		CurrentProfile:    "testProfile",
-		WorkDir:           "/test/workdir",
-		DefaultRepository: "testRepo",
+		CurrentProfile: "testProfile",
 	}
 
 	err := config.Save()
@@ -25,9 +23,7 @@ func TestIssuectlConfig_Save(t *testing.T) {
 
 func TestLoadConfig(t *testing.T) {
 	config := &IssuectlConfig{
-		CurrentProfile:    "testProfile",
-		WorkDir:           "/test/workdir",
-		DefaultRepository: "testRepo",
+		CurrentProfile: "testProfile",
 	}
 
 	err := config.Save()
@@ -38,14 +34,6 @@ func TestLoadConfig(t *testing.T) {
 	loadedConfig := LoadConfig()
 	if loadedConfig.CurrentProfile != config.CurrentProfile {
 		t.Errorf("Expected CurrentProfile '%s', got '%s'", config.CurrentProfile, loadedConfig.CurrentProfile)
-	}
-
-	if loadedConfig.WorkDir != config.WorkDir {
-		t.Errorf("Expected WorkDir '%s', got '%s'", config.WorkDir, loadedConfig.WorkDir)
-	}
-
-	if loadedConfig.DefaultRepository != config.DefaultRepository {
-		t.Errorf("Expected DefaultRepository '%s', got '%s'", config.DefaultRepository, loadedConfig.DefaultRepository)
 	}
 
 	// Clean up
