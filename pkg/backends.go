@@ -19,6 +19,7 @@ type IssueBackend interface {
 	IssueExists(owner string, repo RepoConfigName, issueID IssueID) (bool, error)
 	LinkIssueToRepo(owner string, repo RepoConfigName, issueID IssueID, pullRequestID string) error
 	CloseIssue(owner string, repo RepoConfigName, issueID IssueID) error
+	GetIssue(owner string, repo RepoConfigName, issueID IssueID) (interface{}, error)
 }
 
 type RepositoryBackend interface {
@@ -31,4 +32,44 @@ var IssueBackends map[BackendType]IssueBackend = map[BackendType]IssueBackend{
 
 var RepositoryBackends map[BackendType]RepositoryBackend = map[BackendType]RepositoryBackend{
 	BackendGithub: NewGitHubClient(GitHubToken, GitHubApi),
+}
+
+type GetBackendConfig struct {
+	Type        BackendType
+	GitHubToken string
+	GitHubApi   string
+	GitLabToken string
+	GitLabApi   string
+}
+
+func GetIssueBackend(conf *GetBackendConfig) IssueBackend {
+	switch conf.Type {
+	case BackendGithub:
+		return NewGitHubClient(
+			conf.GitHubToken,
+			conf.GitHubApi,
+		)
+	case BackendGitLab:
+		return NewGitLabClient(
+			conf.GitLabToken,
+			conf.GitLabApi,
+		)
+	}
+	return nil
+}
+
+func GetRepoBackend(conf *GetBackendConfig) RepositoryBackend {
+	switch conf.Type {
+	case BackendGithub:
+		return NewGitHubClient(
+			conf.GitHubToken,
+			conf.GitHubApi,
+		)
+	case BackendGitLab:
+		return NewGitLabClient(
+			conf.GitLabToken,
+			conf.GitLabApi,
+		)
+	}
+	return nil
 }

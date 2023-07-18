@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/google/go-github/github"
 )
 
 const (
@@ -37,10 +39,13 @@ func StartWorkingOnIssue(repositories []string, issueID IssueID) error {
 
 	Log.Infof("Starting work on issue %v ...", issueID)
 
-	// Check if the issue exists on GitHub.
-	ghClient := NewGitHubClient(GitHubToken, GitHubApi)
 	repo := config.GetRepository(profile.Repository)
-	exists, err := ghClient.IssueExists(repo.Owner, repo.Name, issueID)
+	issueBackend := GetIssueBackend(&GetBackendConfig{
+		Type:        BackendGithub,
+		GitHubApi:   GitHubApi,
+		GitHubToken: GitHubToken,
+	})
+	exists, err := issueBackend.IssueExists(repo.Owner, repo.Name, issueID)
 	if err != nil || !exists {
 		return fmt.Errorf("issue does not exist on GitHub: %v", err)
 	}
@@ -50,11 +55,11 @@ func StartWorkingOnIssue(repositories []string, issueID IssueID) error {
 		return err
 	}
 
-	issue, err := ghClient.GetIssue(repo.Owner, string(repo.Name), issueID)
+	issue, err := issueBackend.GetIssue(repo.Owner, repo.Name, issueID)
 	if err != nil {
 		return fmt.Errorf("failed to get the issue: %v", err)
 	}
-	branchName := fmt.Sprintf("%v-%v", issueID, strings.ReplaceAll(*issue.Title, " ", "-"))
+	branchName := fmt.Sprintf("%v-%v", issueID, strings.ReplaceAll(*issue.(*github.Issue).Title, " ", "-"))
 
 	if profile.Repositories != nil {
 		Log.Infof("Cloning multiple repositories: %v", profile.Repositories)
@@ -82,7 +87,7 @@ func StartWorkingOnIssue(repositories []string, issueID IssueID) error {
 	}
 
 	if err := config.AddIssue(&IssueConfig{
-		Name:        *issue.Title,
+		Name:        *issue.(*github.Issue).Title,
 		ID:          issueID,
 		RepoName:    profile.Repository,
 		BranchName:  branchName,
@@ -106,9 +111,14 @@ func OpenPullRequest(issueID IssueID) error {
 	if issue == *emptyIssue {
 		return fmt.Errorf("issueID not found")
 	}
-	ghClient := NewGitHubClient(GitHubToken, GitHubApi)
+
+	repoBackend := GetRepoBackend(&GetBackendConfig{
+		Type:        BackendGithub,
+		GitHubApi:   GitHubApi,
+		GitHubToken: GitHubToken,
+	})
 	repo := config.GetRepository(profile.Repository)
-	return ghClient.OpenPullRequest(
+	return repoBackend.OpenPullRequest(
 		repo.Owner,
 		repo.Name,
 		fmt.Sprintf("%v | %v", issue.ID, issue.Name),
@@ -122,9 +132,13 @@ func FinishWorkingOnIssue(issueID IssueID) error {
 	config := LoadConfig()
 	profile := config.GetProfile(config.GetCurrentProfile())
 	repo := config.GetRepository(profile.Repository)
-	// Close the issue on GitHub.
-	ghClient := NewGitHubClient(GitHubToken, GitHubApi)
-	err := ghClient.CloseIssue(
+
+	issueBackend := GetIssueBackend(&GetBackendConfig{
+		Type:        BackendGithub,
+		GitHubToken: GitHubToken,
+		GitHubApi:   GitHubApi,
+	})
+	err := issueBackend.CloseIssue(
 		repo.Owner,
 		repo.Name,
 		issueID,

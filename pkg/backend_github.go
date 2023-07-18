@@ -44,13 +44,13 @@ func (g *GitHub) IssueExists(owner string, repo RepoConfigName, issueID IssueID)
 	return true, nil
 }
 
-func (g *GitHub) GetIssue(owner, repo string, issueID IssueID) (*github.Issue, error) {
+func (g *GitHub) GetIssue(owner string, repo RepoConfigName, issueID IssueID) (interface{}, error) {
 	issueNumber, err := getIssueNumberFromString(issueID)
 	if err != nil {
 		return nil, err
 	}
 
-	issue, _, err := g.client.Issues.Get(context.Background(), owner, repo, issueNumber)
+	issue, _, err := g.client.Issues.Get(context.Background(), owner, string(repo), issueNumber)
 	if err != nil {
 		return nil, err
 	}
