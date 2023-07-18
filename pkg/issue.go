@@ -44,7 +44,7 @@ func StartWorkingOnIssue(issueID IssueID) error {
 		return err
 	}
 	Log.V(2).Infof("Cloning repo")
-	repoDirPath, err := cloneRepo(&config.Repositories[0], issueDirPath) // FIXME: should use repo name to get repo config instead of getting it with direct array access
+	repoDirPath, err := cloneRepo(repo, issueDirPath)
 	if err != nil {
 		return err
 	}
