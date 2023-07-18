@@ -145,3 +145,14 @@ func (ic *IssuectlConfig) AddRepository(repoConfig *RepoConfig) error {
 	}
 	return nil
 }
+
+// Profiles
+
+func (ic *IssuectlConfig) GetProfile(profileName ProfileName) *Profile {
+	for _, pr := range ic.Profiles {
+		if pr.Name == profileName {
+			return &pr
+		}
+	}
+	return nil
+}
