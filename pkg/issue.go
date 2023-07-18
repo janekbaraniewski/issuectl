@@ -65,31 +65,42 @@ func StartWorkingOnIssue(issueID IssueID) error {
 		return err
 	}
 
-	err = ghClient.OpenPullRequest(
+	Log.Infof("Started working on issue %v", issueID)
+	return nil
+}
+
+func OpenPullRequest(issueID IssueID) error {
+	config := LoadConfig()
+	profile := config.GetProfile(config.CurrentProfile)
+
+	if existing := config.GetIssue(issueID); existing != nil {
+		return fmt.Errorf("issueID already in use")
+	}
+	ghClient := NewGitHubClient(GitHubToken)
+	repo := config.GetRepository(profile.Repository)
+
+	if err := ghClient.OpenPullRequest(
 		repo.Owner,
 		string(repo.Name),
 		"PR title", // Replace with your PR title.
 		"PR body",  // Replace with your PR body.
 		"master",   // Replace with the base branch name.
 		string(issueID),
-	)
-	if err != nil {
+	); err != nil {
 		return fmt.Errorf("failed to open a pull request: %v", err)
 	}
 
-	err = ghClient.LinkIssueToRepo(
+	if err := ghClient.LinkIssueToRepo(
 		GitHubApi,
 		repo.Owner,
 		string(repo.Name),
 		string(issueID),
 		"PR number", // Replace with your PR number.
 		GitHubToken, // Replace with your real GitHub token.
-	)
-	if err != nil {
+	); err != nil {
 		return fmt.Errorf("failed to link the pull request to the issue: %v", err)
 	}
 
-	Log.Infof("Started working on issue %v", issueID)
 	return nil
 }
 
