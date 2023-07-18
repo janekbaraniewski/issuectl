@@ -11,9 +11,9 @@ var repoList []string
 
 func initStartCommand(rootCmd *cobra.Command) {
 	startCmd := &cobra.Command{
-		Use:                "start",
-		Short:              "start",
-		Long:               "",
+		Use:                "start [issue number]",
+		Short:              "Start work on issue",
+		Long:               `Create issue work directory. Clone all repositories from current profile. Create branches.`,
 		FParseErrWhitelist: cobra.FParseErrWhitelist{UnknownFlags: true},
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) != 1 {

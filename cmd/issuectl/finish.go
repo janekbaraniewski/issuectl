@@ -9,9 +9,9 @@ import (
 
 func initFinishCommand(rootCmd *cobra.Command) {
 	finishCmd := &cobra.Command{
-		Use:                "finish",
-		Short:              "finish",
-		Long:               "",
+		Use:                "finish [issue number]",
+		Short:              "Cleanup resources and close issue",
+		Long:               `Removes issue work directory. Closes issue in backend.`,
 		FParseErrWhitelist: cobra.FParseErrWhitelist{UnknownFlags: true},
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) != 1 {
