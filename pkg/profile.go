@@ -9,6 +9,7 @@ type Profile struct {
 	WorkDir      string            `json:"workDir"`
 	Repository   RepoConfigName    `json:"repository"`
 	Backend      BackendConfigName `json:"backend"`
+	GitUserName  GitUserName       `json:"gituser"`
 	Repositories []*RepoConfig     `json:"repositories"`
 }
 

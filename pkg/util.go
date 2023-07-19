@@ -44,9 +44,9 @@ func createBranch(dir, branchName string, gitUser *GitUser) error {
 }
 
 // setRepoIdentity sets local git config username, email and ssh command.
-func setRepoIdentity(dir, username, email, sshKeyPath string) error {
+func setRepoIdentity(dir string, username GitUserName, email, sshKeyPath string) error {
 	// Set local git config user.name
-	cmd := exec.Command("git", "config", "user.name", username)
+	cmd := exec.Command("git", "config", "user.name", string(username))
 	cmd.Dir = dir
 	if err := cmd.Run(); err != nil {
 		return err
