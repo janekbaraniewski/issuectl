@@ -3,7 +3,7 @@
 > # WARNING
 > this is still work in progress.
 
-`issuectl`:
+<img src="logo.png" alt="logo" width="200" />
 
 - gives you clean isolated space for each of your issues
 - helps you manage multiple git repositories and branches involved
