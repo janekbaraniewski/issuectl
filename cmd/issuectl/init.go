@@ -21,28 +21,23 @@ func initInitConfigCommand(rootCmd *cobra.Command) {
 				return fmt.Errorf("config file already exists at %s", configPath)
 			}
 
-			var gitUser issuectl.GitUser
-			var backend issuectl.BackendConfig
-			var profile issuectl.Profile
-			var repo issuectl.RepoConfig
-
 			gitUserSurvey := []*survey.Question{
 				{
-					Name: "Name",
+					Name: "name",
 					Prompt: &survey.Input{
 						Message: "Enter Git user name:",
 					},
 					Validate: survey.Required,
 				},
 				{
-					Name: "Email",
+					Name: "email",
 					Prompt: &survey.Input{
 						Message: "Enter Git user email:",
 					},
 					Validate: survey.Required,
 				},
 				{
-					Name: "SSHKey",
+					Name: "sshKey",
 					Prompt: &survey.Input{
 						Message: "Enter SSH key path:",
 					},
@@ -52,13 +47,6 @@ func initInitConfigCommand(rootCmd *cobra.Command) {
 
 			// Define survey questions for BackendConfig
 			backendSurvey := []*survey.Question{
-				{
-					Name: "name",
-					Prompt: &survey.Input{
-						Message: "Enter backend config name:",
-					},
-					Validate: survey.Required,
-				},
 				{
 					Name: "type",
 					Prompt: &survey.Select{
@@ -71,13 +59,6 @@ func initInitConfigCommand(rootCmd *cobra.Command) {
 
 			// Define survey questions for Profile
 			profileSurvey := []*survey.Question{
-				{
-					Name: "name",
-					Prompt: &survey.Input{
-						Message: "Enter profile name:",
-					},
-					Validate: survey.Required,
-				},
 				{
 					Name: "workdir",
 					Prompt: &survey.Input{
@@ -113,35 +94,58 @@ func initInitConfigCommand(rootCmd *cobra.Command) {
 			}
 
 			// Perform the surveys
-			survey.Ask(gitUserSurvey, &gitUser)
-			survey.Ask(backendSurvey, &backend)
-			survey.Ask(profileSurvey, &profile)
-			survey.Ask(repoSurvey, &repo)
-
-			fmt.Printf("%v", gitUser)
+			gitUserAnswers := struct {
+				Name   string
+				Email  string
+				SSHKey string
+			}{}
+			survey.Ask(gitUserSurvey, &gitUserAnswers)
+			backendAnswers := struct {
+				Type string
+			}{}
+			survey.Ask(backendSurvey, &backendAnswers)
+			profileAnswers := struct {
+				Workdir string
+			}{}
+			survey.Ask(profileSurvey, &profileAnswers)
+			repoAnswers := struct {
+				Name    string
+				Owner   string
+				RepoURL string
+			}{}
+			survey.Ask(repoSurvey, &repoAnswers)
 
 			// Create and save IssuectlConfig
 			config := issuectl.IssuectlConfig{
 				Repositories: map[issuectl.RepoConfigName]issuectl.RepoConfig{
-					issuectl.RepoConfigName(repo.Name): repo,
+					issuectl.RepoConfigName(repoAnswers.Name): {
+						Name:    issuectl.RepoConfigName(repoAnswers.Name),
+						Owner:   repoAnswers.Owner,
+						RepoURL: issuectl.RepoURL(repoAnswers.RepoURL),
+					},
 				},
 				Backends: map[issuectl.BackendConfigName]issuectl.BackendConfig{
-					issuectl.BackendConfigName(backend.Name): backend,
+					issuectl.BackendConfigName("default"): {
+						Name: issuectl.BackendConfigName("default"),
+						Type: issuectl.BackendType(backendAnswers.Type),
+					},
 				},
 				GitUsers: map[issuectl.GitUserName]issuectl.GitUser{
-					issuectl.GitUserName(gitUser.Name): gitUser,
+					issuectl.GitUserName(gitUserAnswers.Name): {
+						Name:   issuectl.GitUserName(gitUserAnswers.Name),
+						Email:  gitUserAnswers.Email,
+						SSHKey: gitUserAnswers.SSHKey,
+					},
 				},
 				Profiles: map[issuectl.ProfileName]issuectl.Profile{
-					issuectl.ProfileName(profile.Name): profile,
+					issuectl.ProfileName("default"): {
+						Name:    issuectl.ProfileName("default"),
+						WorkDir: profileAnswers.Workdir,
+					},
 				},
 			}
-			fmt.Printf("Saving\n")
-			// Save the config here
-			err = config.Save()
-			if err != nil {
-				fmt.Printf("%v\n", err)
-			}
-			return err
+
+			return config.Save()
 		},
 	}
 
