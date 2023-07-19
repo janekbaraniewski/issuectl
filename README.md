@@ -24,12 +24,13 @@ On macOS:
 ➜ issuectl init
 ? Enter Git user name: John Doe
 ? Enter Git user email: john@doe.com
-? Enter SSH key path: /Users/johndoe/.ssh/priv
+? Enter SSH key path: /Users/johndoe/.ssh/id_rsa
 ? Select backend type: github
-? Enter working directory for profile: /Users/johndoe/Workspace
-? Enter repository name: issuectl
-? Enter repository owner: janekbaraniewski
-? Enter repository URL:  git@github.com:janekbaraniewski/issuectl.git
+? Enter backend access token: **************************
+? Enter working directory for profile: /Users/johndoe/Workspace/work_issues
+? Enter repository name: myRepo
+? Enter repository owner: myOrg
+? Enter repository URL: git@github.com:myOrg/myRepo.git
 ```
 
 To see generated config run
@@ -38,15 +39,15 @@ To see generated config run
 ➜ issuectl config get
 currentprofile: ""
 repositories:
-  issuectl:
-    name: issuectl
-    owner: janekbaraniewski
-    repourl: ' git@github.com:janekbaraniewski/issuectl.git'
+  myRepo:
+    name: myRepo
+    owner: myOrg
+    repourl: git@github.com:myOrg/myRepo.git
 issues: {}
 profiles:
   default:
     name: default
-    workdir: /Users/johndoe/Workspace
+    workdir: /Users/johndoe/Workspace/work_issues
     repository: ""
     backend: ""
     gitusername: ""
@@ -55,42 +56,12 @@ backends:
   default:
     name: default
     type: github
+    token: Zm9tZXRva2VubWFnaWNoZWhlaGVoYWhhaGE
 gitusers:
   John Doe:
     name: John Doe
     email: john@doe.com
-    sshkey: /Users/johndoe/.ssh/priv
-```
-
-
-Or
-
-```bash
-➜ cat ~/.issuerc
-currentprofile: ""
-repositories:
-  issuectl:
-    name: issuectl
-    owner: janekbaraniewski
-    repourl: ' git@github.com:janekbaraniewski/issuectl.git'
-issues: {}
-profiles:
-  default:
-    name: default
-    workdir: /Users/johndoe/Workspace
-    repository: ""
-    backend: ""
-    gitusername: ""
-    repositories: []
-backends:
-  default:
-    name: default
-    type: github
-gitusers:
-  John Doe:
-    name: John Doe
-    email: john@doe.com
-    sshkey: /Users/johndoe/.ssh/priv
+    sshkey: /Users/johndoe/.ssh/id_rsa
 ```
 
 ## Usage
