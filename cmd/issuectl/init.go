@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/base64"
 	"fmt"
 	"os"
 
@@ -55,6 +56,13 @@ func initInitConfigCommand(rootCmd *cobra.Command) {
 					},
 					Validate: survey.Required,
 				},
+				{
+					Name: "token",
+					Prompt: &survey.Password{
+						Message: "Enter backend access token:",
+					},
+					Validate: survey.Required,
+				},
 			}
 
 			// Define survey questions for Profile
@@ -101,7 +109,8 @@ func initInitConfigCommand(rootCmd *cobra.Command) {
 			}{}
 			survey.Ask(gitUserSurvey, &gitUserAnswers)
 			backendAnswers := struct {
-				Type string
+				Type  string
+				Token string
 			}{}
 			survey.Ask(backendSurvey, &backendAnswers)
 			profileAnswers := struct {
@@ -126,8 +135,9 @@ func initInitConfigCommand(rootCmd *cobra.Command) {
 				},
 				Backends: map[issuectl.BackendConfigName]issuectl.BackendConfig{
 					issuectl.BackendConfigName("default"): {
-						Name: issuectl.BackendConfigName("default"),
-						Type: issuectl.BackendType(backendAnswers.Type),
+						Name:  issuectl.BackendConfigName("default"),
+						Type:  issuectl.BackendType(backendAnswers.Type),
+						Token: base64.RawStdEncoding.EncodeToString([]byte(backendAnswers.Token)),
 					},
 				},
 				GitUsers: map[issuectl.GitUserName]issuectl.GitUser{
