@@ -7,7 +7,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var repoList []string
+var (
+	repoList    []string
+	profileName string
+)
 
 func initStartCommand(rootCmd *cobra.Command) {
 	startCmd := &cobra.Command{
@@ -22,7 +25,8 @@ func initStartCommand(rootCmd *cobra.Command) {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := issuectl.StartWorkingOnIssue(repoList, issuectl.IssueID(args[0])); err != nil {
+			config := issuectl.LoadConfig()
+			if err := issuectl.StartWorkingOnIssue(config, repoList, issuectl.IssueID(args[0])); err != nil {
 				issuectl.Log.Infof("Error!! -> %v", err)
 				return err
 			}
@@ -37,6 +41,14 @@ func initStartCommand(rootCmd *cobra.Command) {
 		"r",
 		[]string{},
 		"A list of repositories to clone",
+	)
+
+	startCmd.PersistentFlags().StringVarP(
+		&profileName,
+		"profile",
+		"p",
+		"",
+		"Name of profile to use for command",
 	)
 
 	rootCmd.AddCommand(startCmd)
