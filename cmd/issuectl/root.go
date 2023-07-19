@@ -39,6 +39,7 @@ func RootCmd(version string) *cobra.Command {
 	initOpenPullRequestCommand(cmd)
 	initConfigCommand(cmd)
 	initInitConfigCommand(cmd)
+	initListIssuesCommand(cmd)
 	return cmd
 }
 
