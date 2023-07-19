@@ -40,6 +40,7 @@ func RootCmd(version string) *cobra.Command {
 	initConfigCommand(cmd)
 	initInitConfigCommand(cmd)
 	initListIssuesCommand(cmd)
+	initOpenIssueCommand(cmd)
 	return cmd
 }
 
