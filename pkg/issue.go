@@ -23,8 +23,7 @@ func loadGithubToken() string {
 
 var GitHubToken = loadGithubToken()
 
-func StartWorkingOnIssue(repositories []string, issueID IssueID) error {
-	config := LoadConfig()
+func StartWorkingOnIssue(config *IssuectlConfig, repositories []string, issueID IssueID) error {
 	profile := config.GetProfile(config.GetCurrentProfile())
 	for _, repoName := range repositories {
 		rc := config.GetRepository(RepoConfigName(repoName))
