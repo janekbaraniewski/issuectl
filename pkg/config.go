@@ -89,8 +89,9 @@ func (ic *IssuectlConfig) DeleteIssue(issueID IssueID) error {
 	return ic.Save()
 }
 
-func (ic *IssuectlConfig) GetIssue(issueID IssueID) IssueConfig {
-	return ic.Issues[issueID]
+func (ic *IssuectlConfig) GetIssue(issueID IssueID) (IssueConfig, bool) {
+	issue, ok := ic.Issues[issueID]
+	return issue, ok
 }
 
 // Repositories
