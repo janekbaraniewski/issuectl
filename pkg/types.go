@@ -19,6 +19,9 @@ type BackendConfig struct {
 
 	// BackendType of this BackendConfig
 	Type BackendType `json:"backendType"`
+
+	// Token stores base64 encoded token
+	Token string `json:"token"`
 }
 
 type GitUserName string
