@@ -17,6 +17,7 @@ func initConfigCommand(rootCmd *cobra.Command) {
 		Short: "Manage config",
 		Long:  `Manage issuectl config.`,
 	}
+
 	initPrintConfigCommand(configCmd)
 	initBackendCommand(configCmd)
 	initRepositoriesCommand(configCmd)
@@ -178,6 +179,7 @@ func initRepositoriesCommand(rootCmd *cobra.Command) {
 			return nil
 		},
 	}
+
 	initRepoListCommand(repoCmd)
 	initRepoAddCommand(repoCmd)
 	rootCmd.AddCommand(repoCmd)

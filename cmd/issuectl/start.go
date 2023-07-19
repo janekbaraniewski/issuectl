@@ -10,6 +10,7 @@ import (
 var (
 	repoList    []string
 	profileName string
+	backendName string
 )
 
 func initStartCommand(rootCmd *cobra.Command) {
@@ -49,6 +50,14 @@ func initStartCommand(rootCmd *cobra.Command) {
 		"p",
 		"",
 		"Name of profile to use for command",
+	)
+
+	startCmd.PersistentFlags().StringVarP(
+		&backendName,
+		"backend",
+		"b",
+		"",
+		"Name of issue backend to use for command",
 	)
 
 	rootCmd.AddCommand(startCmd)
