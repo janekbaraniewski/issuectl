@@ -10,6 +10,9 @@ type Profile struct {
 	Backend      BackendConfigName `json:"backend"`
 	GitUserName  GitUserName       `json:"gituser"`
 	Repositories []*RepoConfig     `json:"repositories"`
+
+	// DefaultRepository is now used for Github IssueBackend
+	DefaultRepository RepoConfigName `json:"defaultRepository"`
 }
 
 func (p *Profile) AddRepository(repo *RepoConfig) error {

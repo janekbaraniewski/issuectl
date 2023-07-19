@@ -184,6 +184,7 @@ func initInitConfigCommand(rootCmd *cobra.Command) {
 			profile.GitUserName = gitUser.Name
 			profile.AddRepository(&repo)
 			profile.Backend = backend.Name
+			profile.DefaultRepository = repo.Name
 
 			config := issuectl.IssuectlConfig{
 				Repositories: map[issuectl.RepoConfigName]issuectl.RepoConfig{
