@@ -57,7 +57,6 @@ func getRepoBackendConfigurator(backendConfig BackendConfig) (RepositoryBackend,
 func StartWorkingOnIssue(config *IssuectlConfig, repositoriesFromArgs []string, issueID IssueID) error {
 	profile := config.GetProfile(config.GetCurrentProfile())
 	repositories := []string{}
-	Log.Infof("profile %v", profile)
 	for _, repoName := range profile.Repositories {
 		repositories = append(repositories, string(*repoName))
 	}
@@ -73,20 +72,15 @@ func StartWorkingOnIssue(config *IssuectlConfig, repositoriesFromArgs []string, 
 		return err
 	}
 
-	Log.Infof("got backend")
-
 	issue, branchName, err := getIssueAndBranchName(config, issueBackend, &profile, issueID)
 	if err != nil {
 		return err
 	}
-	Log.Infof("got issue")
-	Log.Infof("Repositories %v", profile.Repositories)
-	Log.Infof("Repositories merged %v", repositories)
+
 	newIssue, err := createAndAddRepositoriesToIssue(config, &profile, issueID, issueDirPath, branchName, issue, repositories)
 	if err != nil {
 		return err
 	}
-	Log.Infof("got new issue")
 
 	if err := config.AddIssue(newIssue); err != nil {
 		return err
