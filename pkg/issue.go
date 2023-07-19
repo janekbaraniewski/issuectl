@@ -63,6 +63,15 @@ func StartWorkingOnIssue(config *IssuectlConfig, repositories []string, issueID 
 
 	if profile.Repositories != nil {
 		Log.Infof("Cloning multiple repositories: %v", profile.Repositories)
+		newIssue := &IssueConfig{
+			Name:        *issue.(*github.Issue).Title,
+			ID:          issueID,
+			RepoName:    profile.Repository,
+			BranchName:  branchName,
+			BackendName: "github",
+			Dir:         issueDirPath,
+			Profile:     profile.Name,
+		}
 		for _, repo := range profile.Repositories {
 			Log.Infof("Cloning repo %v", repo.Name)
 			repoDirPath, err := cloneRepo(repo, issueDirPath)
@@ -73,7 +82,12 @@ func StartWorkingOnIssue(config *IssuectlConfig, repositories []string, issueID 
 			if err := createBranch(repoDirPath, branchName); err != nil {
 				return err
 			}
+			newIssue.Repositories = append(newIssue.Repositories, repo.Name)
 		}
+		if err := config.AddIssue(newIssue); err != nil {
+			return err
+		}
+
 	} else {
 		Log.V(2).Infof("Cloning repo")
 		repoDirPath, err := cloneRepo(&repo, issueDirPath)
@@ -84,18 +98,17 @@ func StartWorkingOnIssue(config *IssuectlConfig, repositories []string, issueID 
 		if err := createBranch(repoDirPath, branchName); err != nil {
 			return err
 		}
-	}
-
-	if err := config.AddIssue(&IssueConfig{
-		Name:        *issue.(*github.Issue).Title,
-		ID:          issueID,
-		RepoName:    profile.Repository,
-		BranchName:  branchName,
-		BackendName: "github",
-		Dir:         issueDirPath,
-		Profile:     profile.Name,
-	}); err != nil {
-		return err
+		if err := config.AddIssue(&IssueConfig{
+			Name:        *issue.(*github.Issue).Title,
+			ID:          issueID,
+			RepoName:    profile.Repository,
+			BranchName:  branchName,
+			BackendName: "github",
+			Dir:         issueDirPath,
+			Profile:     profile.Name,
+		}); err != nil {
+			return err
+		}
 	}
 
 	Log.Infof("Started working on issue %v", issueID)
