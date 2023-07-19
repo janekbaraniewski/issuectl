@@ -1,5 +1,11 @@
 # issuectl
 
+![Release](https://badgen.net/github/release/janekbaraniewski/issuectl)
+[![License](https://img.shields.io/github/license/janekbaraniewski/issuectl.svg)](LICENSE)
+![GH workflow](https://github.com/janekbaraniewski/issuectl/actions/workflows/test.yml/badge.svg)
+[![Go Report Card](https://goreportcard.com/badge/github.com/janekbaraniewski/issuectl)](https://goreportcard.com/report/github.com/janekbaraniewski/issuectl)
+[![Go Reference](https://pkg.go.dev/badge/github.com/janekbaraniewski/issuectl.svg)](https://pkg.go.dev/github.com/janekbaraniewski/issuectl)
+
 > # WARNING
 > this is still work in progress.
 
