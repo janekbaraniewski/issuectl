@@ -9,13 +9,13 @@ type Profile struct {
 	WorkDir      string            `json:"workDir"`
 	Backend      BackendConfigName `json:"backend"`
 	GitUserName  GitUserName       `json:"gituser"`
-	Repositories []*RepoConfig     `json:"repositories"`
+	Repositories []*RepoConfigName `json:"repositories"`
 
 	// DefaultRepository is now used for Github IssueBackend
 	DefaultRepository RepoConfigName `json:"defaultRepository"`
 }
 
-func (p *Profile) AddRepository(repo *RepoConfig) error {
+func (p *Profile) AddRepository(repo *RepoConfigName) error {
 	p.Repositories = append(p.Repositories, repo)
 	return nil
 }

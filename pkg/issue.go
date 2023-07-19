@@ -17,8 +17,8 @@ const (
 func StartWorkingOnIssue(config *IssuectlConfig, repositories []string, issueID IssueID) error {
 	profile := config.GetProfile(config.GetCurrentProfile())
 	for _, repoName := range repositories {
-		rc := config.GetRepository(RepoConfigName(repoName))
-		if err := profile.AddRepository(&rc); err != nil {
+		// TODO: make sure that repos are not duplicated OR overwrite instead of adding repositories
+		if err := profile.AddRepository((*RepoConfigName)(&repoName)); err != nil {
 			return err
 		}
 	}
@@ -65,9 +65,10 @@ func StartWorkingOnIssue(config *IssuectlConfig, repositories []string, issueID 
 		Dir:         issueDirPath,
 		Profile:     profile.Name,
 	}
-	for _, repo := range profile.Repositories {
+	for _, repoName := range profile.Repositories {
+		repo := config.GetRepository(*repoName)
 		Log.Infof("Cloning repo %v", repo.Name)
-		repoDirPath, err := cloneRepo(repo, issueDirPath, &gitUser)
+		repoDirPath, err := cloneRepo(&repo, issueDirPath, &gitUser)
 		if err != nil {
 			return err
 		}

@@ -30,13 +30,14 @@ func initProfileListCommand(rootCmd *cobra.Command) {
 		Use:   "list",
 		Short: "List all profiles",
 		Run: func(cmd *cobra.Command, args []string) {
-			profiles := issuectl.LoadConfig().GetProfiles()
+			config := issuectl.LoadConfig()
+			profiles := config.GetProfiles()
 			w := tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', 0)
 			fmt.Fprintln(w, "NAME\tWORK DIR\tBACKEND\tREPOSITORIES\t")
 			for _, profile := range profiles {
 				repos := []string{}
-				for _, repo := range profile.Repositories {
-					repos = append(repos, string(repo.Name))
+				for _, repoName := range profile.Repositories {
+					repos = append(repos, string(*repoName))
 				}
 				fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t%v\t%v\t", profile.Name, profile.WorkDir, profile.Backend, repos))
 			}
@@ -56,10 +57,9 @@ func initProfileAddCommand(rootCmd *cobra.Command) {
 			config := issuectl.LoadConfig()
 			profileName := args[0]
 			workDir := args[1]
-			repos := []*issuectl.RepoConfig{}
+			repos := []*issuectl.RepoConfigName{}
 			for _, repoName := range repoList {
-				repo := config.GetRepository(issuectl.RepoConfigName(repoName))
-				repos = append(repos, &repo)
+				repos = append(repos, (*issuectl.RepoConfigName)(&repoName))
 			}
 			newProfile := &issuectl.Profile{
 				Name:         issuectl.ProfileName(profileName),
@@ -120,17 +120,12 @@ func initProfileAddRepoCommand(rootCmd *cobra.Command) {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			config := issuectl.LoadConfig()
 			repoName := args[0]
-			issuectl.Log.Infof("repoName - %v", repoName)
 			profile := config.GetProfile(config.GetCurrentProfile())
-			issuectl.Log.Infof("profile - %v", profile)
-			repo := config.GetRepository(issuectl.RepoConfigName(repoName))
-			issuectl.Log.Infof("repo - %v", repo)
-			profile.AddRepository(&repo)
-			issuectl.Log.Infof("profile after add -> %v", profile)
+			profile.AddRepository((*issuectl.RepoConfigName)(&repoName))
 			if err := config.UpdateProfile(&profile); err != nil {
 				return err
 			}
-			issuectl.Log.Infof("config -> %v", config)
+
 			return config.Save()
 		},
 	}
