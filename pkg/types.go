@@ -60,7 +60,6 @@ type IssueConfig struct {
 	ID           IssueID           `json:"id"`
 	BackendName  BackendConfigName `json:"backendName"`
 	BranchName   string            `json:"branchName"`
-	RepoName     RepoConfigName    `json:"repoName"`
 	Repositories []RepoConfigName  `json:"repositories"`
 	Dir          string            `json:"dir"`
 	Profile      ProfileName       `json:"profile"`

@@ -28,7 +28,7 @@ func StartWorkingOnIssue(config *IssuectlConfig, repositories []string, issueID 
 
 	Log.Infof("Starting work on issue %v ...", issueID)
 
-	repo := config.GetRepository(profile.Repository)
+	repo := config.GetRepository(profile.DefaultRepository)
 	backendConfig := config.GetBackend(profile.Backend)
 	gitUser, _ := config.GetGitUser(profile.GitUserName)
 	ghToken, err := base64.RawStdEncoding.DecodeString(backendConfig.Token)
@@ -56,36 +56,18 @@ func StartWorkingOnIssue(config *IssuectlConfig, repositories []string, issueID 
 	}
 	branchName := fmt.Sprintf("%v-%v", issueID, strings.ReplaceAll(*issue.(*github.Issue).Title, " ", "-"))
 
-	if profile.Repositories != nil {
-		Log.Infof("Cloning multiple repositories: %v", profile.Repositories)
-		newIssue := &IssueConfig{
-			Name:        *issue.(*github.Issue).Title,
-			ID:          issueID,
-			RepoName:    profile.Repository,
-			BranchName:  branchName,
-			BackendName: "github",
-			Dir:         issueDirPath,
-			Profile:     profile.Name,
-		}
-		for _, repo := range profile.Repositories {
-			Log.Infof("Cloning repo %v", repo.Name)
-			repoDirPath, err := cloneRepo(repo, issueDirPath, &gitUser)
-			if err != nil {
-				return err
-			}
-			Log.V(2).Infof("Creating branch")
-			if err := createBranch(repoDirPath, branchName, &gitUser); err != nil {
-				return err
-			}
-			newIssue.Repositories = append(newIssue.Repositories, repo.Name)
-		}
-		if err := config.AddIssue(newIssue); err != nil {
-			return err
-		}
-
-	} else {
-		Log.V(2).Infof("Cloning repo")
-		repoDirPath, err := cloneRepo(&repo, issueDirPath, &gitUser)
+	Log.Infof("Cloning multiple repositories: %v", profile.Repositories)
+	newIssue := &IssueConfig{
+		Name:        *issue.(*github.Issue).Title,
+		ID:          issueID,
+		BranchName:  branchName,
+		BackendName: "github",
+		Dir:         issueDirPath,
+		Profile:     profile.Name,
+	}
+	for _, repo := range profile.Repositories {
+		Log.Infof("Cloning repo %v", repo.Name)
+		repoDirPath, err := cloneRepo(repo, issueDirPath, &gitUser)
 		if err != nil {
 			return err
 		}
@@ -93,17 +75,10 @@ func StartWorkingOnIssue(config *IssuectlConfig, repositories []string, issueID 
 		if err := createBranch(repoDirPath, branchName, &gitUser); err != nil {
 			return err
 		}
-		if err := config.AddIssue(&IssueConfig{
-			Name:        *issue.(*github.Issue).Title,
-			ID:          issueID,
-			RepoName:    profile.Repository,
-			BranchName:  branchName,
-			BackendName: "github",
-			Dir:         issueDirPath,
-			Profile:     profile.Name,
-		}); err != nil {
-			return err
-		}
+		newIssue.Repositories = append(newIssue.Repositories, repo.Name)
+	}
+	if err := config.AddIssue(newIssue); err != nil {
+		return err
 	}
 
 	Log.Infof("Started working on issue %v", issueID)
@@ -129,7 +104,7 @@ func OpenPullRequest(issueID IssueID) error {
 		GitHubApi:   GitHubApi,
 		GitHubToken: string(ghToken),
 	})
-	repo := config.GetRepository(profile.Repository)
+	repo := config.GetRepository(profile.DefaultRepository)
 	return repoBackend.OpenPullRequest(
 		repo.Owner,
 		repo.Name,
@@ -143,7 +118,7 @@ func OpenPullRequest(issueID IssueID) error {
 func FinishWorkingOnIssue(issueID IssueID) error {
 	config := LoadConfig()
 	profile := config.GetProfile(config.GetCurrentProfile())
-	repo := config.GetRepository(profile.Repository)
+	repo := config.GetRepository(profile.DefaultRepository)
 	backendConfig := config.GetBackend(profile.Backend)
 	ghToken, err := base64.RawStdEncoding.DecodeString(backendConfig.Token)
 	if err != nil {
