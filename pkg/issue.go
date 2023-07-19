@@ -1,6 +1,7 @@
 package issuectl
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"os"
@@ -12,17 +13,6 @@ import (
 const (
 	GitHubApi = "https://api.github.com/"
 )
-
-func loadGithubToken() string {
-	content, err := os.ReadFile("gh-access-token")
-	if err != nil {
-		Log.Infof("FATAL - no gh access token found")
-		return ""
-	}
-	return string(content)
-}
-
-var GitHubToken = loadGithubToken()
 
 func StartWorkingOnIssue(config *IssuectlConfig, repositories []string, issueID IssueID) error {
 	profile := config.GetProfile(config.GetCurrentProfile())
@@ -41,11 +31,14 @@ func StartWorkingOnIssue(config *IssuectlConfig, repositories []string, issueID 
 	repo := config.GetRepository(profile.Repository)
 	backendConfig := config.GetBackend(profile.Backend)
 	gitUser, _ := config.GetGitUser(profile.GitUserName)
-
+	ghToken, err := base64.RawStdEncoding.DecodeString(backendConfig.Token)
+	if err != nil {
+		return err
+	}
 	issueBackend := GetIssueBackend(&GetBackendConfig{
 		Type:        backendConfig.Type,
 		GitHubApi:   GitHubApi,
-		GitHubToken: GitHubToken,
+		GitHubToken: string(ghToken),
 	})
 	exists, err := issueBackend.IssueExists(repo.Owner, repo.Name, issueID)
 	if err != nil || !exists {
@@ -127,10 +120,14 @@ func OpenPullRequest(issueID IssueID) error {
 	}
 
 	backendConfig := config.GetBackend(profile.Backend)
+	ghToken, err := base64.RawStdEncoding.DecodeString(backendConfig.Token)
+	if err != nil {
+		return err
+	}
 	repoBackend := GetRepoBackend(&GetBackendConfig{
 		Type:        backendConfig.Type,
 		GitHubApi:   GitHubApi,
-		GitHubToken: GitHubToken,
+		GitHubToken: string(ghToken),
 	})
 	repo := config.GetRepository(profile.Repository)
 	return repoBackend.OpenPullRequest(
@@ -148,12 +145,16 @@ func FinishWorkingOnIssue(issueID IssueID) error {
 	profile := config.GetProfile(config.GetCurrentProfile())
 	repo := config.GetRepository(profile.Repository)
 	backendConfig := config.GetBackend(profile.Backend)
+	ghToken, err := base64.RawStdEncoding.DecodeString(backendConfig.Token)
+	if err != nil {
+		return err
+	}
 	issueBackend := GetIssueBackend(&GetBackendConfig{
 		Type:        backendConfig.Type,
-		GitHubToken: GitHubToken,
+		GitHubToken: string(ghToken),
 		GitHubApi:   GitHubApi,
 	})
-	err := issueBackend.CloseIssue(
+	err = issueBackend.CloseIssue(
 		repo.Owner,
 		repo.Name,
 		issueID,
