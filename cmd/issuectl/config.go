@@ -22,6 +22,7 @@ func initConfigCommand(rootCmd *cobra.Command) {
 	initBackendCommand(configCmd)
 	initRepositoriesCommand(configCmd)
 	initProfileCommand(configCmd)
+	initGitUserCommand(configCmd)
 	rootCmd.AddCommand(configCmd)
 }
 
@@ -183,4 +184,68 @@ func initRepositoriesCommand(rootCmd *cobra.Command) {
 	initRepoListCommand(repoCmd)
 	initRepoAddCommand(repoCmd)
 	rootCmd.AddCommand(repoCmd)
+}
+
+func initGitUserListCommand(rootCmd *cobra.Command) {
+	listCmd := &cobra.Command{
+		Use:   "list",
+		Short: "List all Git users",
+		Run: func(cmd *cobra.Command, args []string) {
+			w := tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', 0)
+			fmt.Fprintln(w, "NAME\tEMAIL\tSSH KEY\t")
+			for _, user := range issuectl.LoadConfig().GetGitUsers() {
+				fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t%v\t", user.GitUserName, user.Email, user.SSHKey))
+			}
+			w.Flush()
+		},
+	}
+
+	rootCmd.AddCommand(listCmd)
+}
+
+func initGitUserAddCommand(rootCmd *cobra.Command) {
+	addCmd := &cobra.Command{
+		Use:   "add [username] [email] [sshKey]",
+		Short: "Add a new Git user",
+		Args:  cobra.ExactArgs(3), // Expects exactly 3 arguments
+		RunE: func(cmd *cobra.Command, args []string) error {
+			conf := issuectl.LoadConfig()
+			gitUser := &issuectl.GitUser{
+				GitUserName: args[0],
+				Email:       args[1],
+				SSHKey:      args[2],
+			}
+			return conf.AddGitUser(gitUser)
+		},
+	}
+
+	rootCmd.AddCommand(addCmd)
+}
+
+func initGitUserDeleteCommand(rootCmd *cobra.Command) {
+	deleteCmd := &cobra.Command{
+		Use:   "delete",
+		Short: "Delete a Git user",
+		Args:  cobra.ExactArgs(1), // Expects exactly 1 argument
+		RunE: func(cmd *cobra.Command, args []string) error {
+			conf := issuectl.LoadConfig()
+			return conf.DeleteGitUser(issuectl.GitUserName(args[0]))
+		},
+	}
+
+	rootCmd.AddCommand(deleteCmd)
+}
+
+func initGitUserCommand(rootCmd *cobra.Command) {
+	userCmd := &cobra.Command{
+		Use:   "gituser",
+		Short: "Manage Git users",
+		Long:  `Manage Git users. You can list, add, delete Git users.`,
+	}
+
+	initGitUserListCommand(userCmd)
+	initGitUserAddCommand(userCmd)
+	initGitUserDeleteCommand(userCmd)
+
+	rootCmd.AddCommand(userCmd)
 }

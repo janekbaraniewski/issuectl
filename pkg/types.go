@@ -19,9 +19,15 @@ type BackendConfig struct {
 
 	// BackendType of this BackendConfig
 	Type BackendType `json:"backendType"`
+}
 
-	// Path to SSL key to use for git
-	SSLKeyPath string `json:"auth"`
+type GitUserName string
+
+// GitUser holds config for git user
+type GitUser struct {
+	GitUserName string `json:"name"`
+	Email       string `json:"email"`
+	SSHKey      string `json:"sshKey"`
 }
 
 // RepoURL is a string with URL to git repo for cloning

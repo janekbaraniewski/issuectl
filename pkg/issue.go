@@ -23,6 +23,11 @@ func loadGithubToken() string {
 }
 
 var GitHubToken = loadGithubToken()
+var DefaultUser = &GitUser{
+	GitUserName: "Jan Baraniewski",
+	Email:       "dev@baraniewski.com",
+	SSHKey:      "/Users/janbaraniewski/.ssh/priv",
+}
 
 func StartWorkingOnIssue(config *IssuectlConfig, repositories []string, issueID IssueID) error {
 	profile := config.GetProfile(config.GetCurrentProfile())
@@ -74,12 +79,12 @@ func StartWorkingOnIssue(config *IssuectlConfig, repositories []string, issueID 
 		}
 		for _, repo := range profile.Repositories {
 			Log.Infof("Cloning repo %v", repo.Name)
-			repoDirPath, err := cloneRepo(repo, issueDirPath)
+			repoDirPath, err := cloneRepo(repo, issueDirPath, DefaultUser)
 			if err != nil {
 				return err
 			}
 			Log.V(2).Infof("Creating branch")
-			if err := createBranch(repoDirPath, branchName); err != nil {
+			if err := createBranch(repoDirPath, branchName, DefaultUser); err != nil {
 				return err
 			}
 			newIssue.Repositories = append(newIssue.Repositories, repo.Name)
@@ -90,12 +95,12 @@ func StartWorkingOnIssue(config *IssuectlConfig, repositories []string, issueID 
 
 	} else {
 		Log.V(2).Infof("Cloning repo")
-		repoDirPath, err := cloneRepo(&repo, issueDirPath)
+		repoDirPath, err := cloneRepo(&repo, issueDirPath, DefaultUser)
 		if err != nil {
 			return err
 		}
 		Log.V(2).Infof("Creating branch")
-		if err := createBranch(repoDirPath, branchName); err != nil {
+		if err := createBranch(repoDirPath, branchName, DefaultUser); err != nil {
 			return err
 		}
 		if err := config.AddIssue(&IssueConfig{
