@@ -54,13 +54,12 @@ func getRepoBackendConfigurator(backendConfig BackendConfig) (RepositoryBackend,
 }
 
 // StartWorkingOnIssue starts work on an issue
-func StartWorkingOnIssue(config *IssuectlConfig, repositories []string, issueID IssueID) error {
+func StartWorkingOnIssue(config *IssuectlConfig, repositoriesFromArgs []string, issueID IssueID) error {
 	profile := config.GetProfile(config.GetCurrentProfile())
-
-	for _, repoName := range repositories {
-		if err := addRepositoryToProfile(&profile, repoName); err != nil {
-			return err
-		}
+	repositories := []string{}
+	Log.Infof("profile %v", profile)
+	for _, repoName := range profile.Repositories {
+		repositories = append(repositories, string(*repoName))
 	}
 
 	if isIssueIdInUse(config, issueID) {
@@ -74,29 +73,26 @@ func StartWorkingOnIssue(config *IssuectlConfig, repositories []string, issueID 
 		return err
 	}
 
+	Log.Infof("got backend")
+
 	issue, branchName, err := getIssueAndBranchName(config, issueBackend, &profile, issueID)
 	if err != nil {
 		return err
 	}
-
+	Log.Infof("got issue")
+	Log.Infof("Repositories %v", profile.Repositories)
+	Log.Infof("Repositories merged %v", repositories)
 	newIssue, err := createAndAddRepositoriesToIssue(config, &profile, issueID, issueDirPath, branchName, issue, repositories)
 	if err != nil {
 		return err
 	}
+	Log.Infof("got new issue")
 
 	if err := config.AddIssue(newIssue); err != nil {
 		return err
 	}
 
 	Log.Infof("Started working on issue %v", issueID)
-	return nil
-}
-
-// addRepositoryToProfile adds repository to profile
-func addRepositoryToProfile(profile *Profile, repoName string) error {
-	if err := profile.AddRepository((*RepoConfigName)(&repoName)); err != nil {
-		return err
-	}
 	return nil
 }
 
