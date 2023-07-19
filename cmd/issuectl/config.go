@@ -66,7 +66,6 @@ func initBackendListCommand(rootCmd *cobra.Command) {
 			fmt.Fprintln(w, "NAME\tTYPE\t")
 			for _, backend := range issuectl.LoadConfig().GetBackends() {
 				fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t", backend.Name, backend.Type))
-				fmt.Println(backend.Name)
 			}
 			w.Flush()
 		},
