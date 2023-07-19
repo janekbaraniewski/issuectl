@@ -128,9 +128,13 @@ func initRepoListCommand(rootCmd *cobra.Command) {
 		Short:              "List all repositories",
 		Long:               `List all repositories`,
 		FParseErrWhitelist: cobra.FParseErrWhitelist{UnknownFlags: true},
-		RunE: func(cmd *cobra.Command, args []string) error {
-			config := issuectl.LoadConfig()
-			return config.ListRepositories()
+		Run: func(cmd *cobra.Command, args []string) {
+			w := tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', 0)
+			fmt.Fprintln(w, "NAME\tOWNER\tURL\t")
+			for _, repo := range issuectl.LoadConfig().GetRepositories() {
+				fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t%v\t", repo.Name, repo.Owner, repo.RepoURL))
+			}
+			w.Flush()
 		},
 	}
 

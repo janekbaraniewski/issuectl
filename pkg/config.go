@@ -162,3 +162,7 @@ func (ic *IssuectlConfig) DeleteBackend(backendName BackendConfigName) error {
 func (ic *IssuectlConfig) GetBackends() map[BackendConfigName]BackendConfig {
 	return ic.Backends
 }
+
+func (ic *IssuectlConfig) GetRepositories() map[RepoConfigName]RepoConfig {
+	return ic.Repositories
+}
