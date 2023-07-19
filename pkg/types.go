@@ -44,11 +44,12 @@ type IssueID string
 
 // IssueConfig stores configuration for single issue
 type IssueConfig struct {
-	Name        string            `json:"name"`
-	ID          IssueID           `json:"id"`
-	BackendName BackendConfigName `json:"backendName"`
-	BranchName  string            `json:"branchName"`
-	RepoName    RepoConfigName    `json:"repoName"`
-	Dir         string            `json:"dir"`
-	Profile     ProfileName       `json:"profile"`
+	Name         string            `json:"name"`
+	ID           IssueID           `json:"id"`
+	BackendName  BackendConfigName `json:"backendName"`
+	BranchName   string            `json:"branchName"`
+	RepoName     RepoConfigName    `json:"repoName"`
+	Repositories []RepoConfigName  `json:"repositories"`
+	Dir          string            `json:"dir"`
+	Profile      ProfileName       `json:"profile"`
 }

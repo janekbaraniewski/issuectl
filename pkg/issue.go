@@ -1,6 +1,7 @@
 package issuectl
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -31,8 +32,7 @@ func StartWorkingOnIssue(config *IssuectlConfig, repositories []string, issueID 
 			return err
 		}
 	}
-	emptyIssue := &IssueConfig{}
-	if existing := config.GetIssue(issueID); existing != *emptyIssue {
+	if _, found := config.GetIssue(issueID); found {
 		return fmt.Errorf("issueID already in use")
 	}
 
@@ -106,9 +106,8 @@ func OpenPullRequest(issueID IssueID) error {
 	config := LoadConfig()
 	profile := config.GetProfile(config.GetCurrentProfile())
 
-	issue := config.GetIssue(issueID)
-	emptyIssue := &IssueConfig{}
-	if issue == *emptyIssue {
+	issue, found := config.GetIssue(issueID)
+	if !found {
 		return fmt.Errorf("issueID not found")
 	}
 
@@ -150,7 +149,10 @@ func FinishWorkingOnIssue(issueID IssueID) error {
 
 	Log.Infof("Cleaning up after work on issue %v", issueID)
 
-	issue := config.GetIssue(issueID)
+	issue, found := config.GetIssue(issueID)
+	if !found {
+		return errors.New("Issue not found")
+	}
 
 	if err := os.RemoveAll(issue.Dir); err != nil {
 		return err
