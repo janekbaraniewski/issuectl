@@ -19,7 +19,16 @@ func getDefaultConfigFilePath() string {
 	return filepath.Join(dirname, ".issuerc")
 }
 
+func getDefaultSSHKeyPath() string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return ""
+	}
+	return filepath.Join(home, ".ssh/id_ed25519")
+}
+
 var DefaultConfigFilePath = getDefaultConfigFilePath()
+var DefaultSSHKeyPath = getDefaultSSHKeyPath()
 
 // IssuectlConfig manages configuration
 type IssuectlConfig struct {
@@ -28,6 +37,7 @@ type IssuectlConfig struct {
 	Issues         map[IssueID]IssueConfig             `json:"issues"`
 	Profiles       map[ProfileName]Profile             `json:"profiles"`
 	Backends       map[BackendConfigName]BackendConfig `json:"backends"`
+	GitUsers       map[GitUserName]GitUser             `json:"gitUsers"`
 }
 
 func (c *IssuectlConfig) Save() error {
@@ -165,4 +175,24 @@ func (ic *IssuectlConfig) GetBackends() map[BackendConfigName]BackendConfig {
 
 func (ic *IssuectlConfig) GetRepositories() map[RepoConfigName]RepoConfig {
 	return ic.Repositories
+}
+
+// GitUsers
+func (ic *IssuectlConfig) GetGitUser(userName GitUserName) (GitUser, bool) {
+	gitUser, exists := ic.GitUsers[userName]
+	return gitUser, exists
+}
+
+func (ic *IssuectlConfig) AddGitUser(user *GitUser) error {
+	ic.GitUsers[GitUserName(user.GitUserName)] = *user
+	return ic.Save()
+}
+
+func (ic *IssuectlConfig) DeleteGitUser(userName GitUserName) error {
+	delete(ic.GitUsers, userName)
+	return ic.Save()
+}
+
+func (ic *IssuectlConfig) GetGitUsers() map[GitUserName]GitUser {
+	return ic.GitUsers
 }
