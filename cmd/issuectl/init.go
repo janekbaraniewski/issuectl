@@ -187,6 +187,7 @@ func initInitConfigCommand(rootCmd *cobra.Command) {
 			profile.DefaultRepository = repo.Name
 
 			config := issuectl.IssuectlConfig{
+				CurrentProfile: profile.Name,
 				Repositories: map[issuectl.RepoConfigName]issuectl.RepoConfig{
 					repo.Name: repo,
 				},
