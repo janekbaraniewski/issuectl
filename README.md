@@ -31,9 +31,10 @@ On macOS:
 ? Enter Git user name: John Doe
 ? Enter Git user email: john@doe.com
 ? Enter SSH key path: /Users/johndoe/.ssh/id_rsa
+? Do you want to configure a backend? Yes
 ? Select backend type: github
-? Enter backend access token: **************************
-? Enter working directory for profile: /Users/johndoe/Workspace/work_issues
+? Enter backend token: *******
+? Enter working directory for profile: /Users/johndoe/Workspace/workIssues
 ? Enter repository name: myRepo
 ? Enter repository owner: myOrg
 ? Enter repository URL: git@github.com:myOrg/myRepo.git
@@ -53,16 +54,17 @@ issues: {}
 profiles:
   default:
     name: default
-    workdir: /Users/johndoe/Workspace/work_issues
-    repository: ""
-    backend: ""
-    gitusername: ""
-    repositories: []
+    workdir: /Users/johndoe/Workspace/workIssues
+    backend: default
+    gitusername: John Doe
+    repositories:
+    - myRepo
+    defaultrepository: myRepo
 backends:
   default:
     name: default
     type: github
-    token: Zm9tZXRva2VubWFnaWNoZWhlaGVoYWhhaGE
+    token: bmljZXRyeQ
 gitusers:
   John Doe:
     name: John Doe
@@ -74,9 +76,17 @@ gitusers:
 
 ```bash
 ➜ issuectl --help
-issuectl
-        issuectl
-                issuectl
+
+issuectl helps managing separate environments for work on multiple issues.
+
+Start work on issue:
+        issuectl start [issueNumber]
+
+Open PR and link it to issue
+        issuectl openpr [issueNumber]
+
+Finish work, close the issue
+        issuectl finish [issueNumber]
 
 Usage:
   issuectl [flags]
@@ -87,6 +97,9 @@ Available Commands:
   config      Manage config
   finish      Cleanup resources and close issue
   help        Help about any command
+  init        Initialize configuration
+  list        List all issues
+  open        Open specified issue in the preferred code editor
   openpr      Opens a pull request for the specified issue
   start       Start work on issue
 
@@ -96,8 +109,8 @@ Flags:
 Use "issuectl [command] --help" for more information about a command.
 ```
 
-Basic idea of workflow and what systems this can interact with at each step
-![](diagram.png)
+> This is a basic idea of workflow and what systems this can interact with at each step.
+![diagram](diagram.png)
 
 ### Repositories
 
@@ -139,17 +152,17 @@ With all of this in place you can work on issues
 #### Start
 
 ```bash
-➜ issuectl start 15
+➜ issuectl start [issueNumber]
 ```
 
 #### Open PR
 
 ```bash
-➜ issuectl openpr 15
+➜ issuectl openpr [issueNumber]
 ```
 
 #### Finish
 
 ```bash
-➜ issuectl finish 15
+➜ issuectl finish [issueNumber]
 ```
