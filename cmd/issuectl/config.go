@@ -211,7 +211,7 @@ func initGitUserAddCommand(rootCmd *cobra.Command) {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			conf := issuectl.LoadConfig()
 			gitUser := &issuectl.GitUser{
-				GitUserName: args[0],
+				GitUserName: issuectl.GitUserName(args[0]),
 				Email:       args[1],
 				SSHKey:      args[2],
 			}
