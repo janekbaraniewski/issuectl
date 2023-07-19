@@ -40,23 +40,35 @@ func initProfileListCommand(rootCmd *cobra.Command) {
 
 func initProfileAddCommand(rootCmd *cobra.Command) {
 	addCmd := &cobra.Command{
-		Use:   "add [name] [workdir] [defaultrepository]",
+		Use:   "add [name] [workdir]",
 		Short: "Add a new profile",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			config := issuectl.LoadConfig()
 			profileName := args[0]
 			workDir := args[1]
-			defaultRepository := args[2]
+			repos := []*issuectl.RepoConfig{}
+			for _, repoName := range repoList {
+				repo := config.GetRepository(issuectl.RepoConfigName(repoName))
+				repos = append(repos, &repo)
+			}
 			newProfile := &issuectl.Profile{
-				Name:       issuectl.ProfileName(profileName),
-				WorkDir:    workDir,
-				Repository: issuectl.RepoConfigName(defaultRepository),
-				Backend:    "github",
+				Name:         issuectl.ProfileName(profileName),
+				WorkDir:      workDir,
+				Repositories: repos,
+				Backend:      "github",
 			}
 			return config.AddProfile(newProfile)
 		},
 	}
+
+	addCmd.PersistentFlags().StringSliceVarP(
+		&repoList,
+		"repos",
+		"r",
+		[]string{},
+		"A list of repositories to clone",
+	)
 
 	rootCmd.AddCommand(addCmd)
 }
