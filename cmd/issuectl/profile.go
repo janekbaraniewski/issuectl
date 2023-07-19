@@ -2,6 +2,8 @@ package cli
 
 import (
 	"fmt"
+	"os"
+	"text/tabwriter"
 
 	issuectl "github.com/janekbaraniewski/issuectl/pkg"
 	"github.com/spf13/cobra"
@@ -29,9 +31,16 @@ func initProfileListCommand(rootCmd *cobra.Command) {
 		Short: "List all profiles",
 		Run: func(cmd *cobra.Command, args []string) {
 			profiles := issuectl.LoadConfig().GetProfiles()
+			w := tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', 0)
+			fmt.Fprintln(w, "NAME\tWORK DIR\tBACKEND\tREPOSITORIES\t")
 			for _, profile := range profiles {
-				fmt.Println(profile.Name)
+				repos := []string{}
+				for _, repo := range profile.Repositories {
+					repos = append(repos, string(repo.Name))
+				}
+				fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t%v\t%v\t", profile.Name, profile.WorkDir, profile.Backend, repos))
 			}
+			w.Flush()
 		},
 	}
 
