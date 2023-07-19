@@ -3,6 +3,8 @@ package cli
 import (
 	"errors"
 	"fmt"
+	"os"
+	"text/tabwriter"
 
 	issuectl "github.com/janekbaraniewski/issuectl/pkg"
 	"github.com/spf13/cobra"
@@ -60,9 +62,13 @@ func initBackendListCommand(rootCmd *cobra.Command) {
 		Use:   "list",
 		Short: "List all backends",
 		Run: func(cmd *cobra.Command, args []string) {
+			w := tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', 0)
+			fmt.Fprintln(w, "NAME\tTYPE\t")
 			for _, backend := range issuectl.LoadConfig().GetBackends() {
+				fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t", backend.Name, backend.Type))
 				fmt.Println(backend.Name)
 			}
+			w.Flush()
 		},
 	}
 
