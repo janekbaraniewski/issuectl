@@ -184,7 +184,7 @@ func (ic *IssuectlConfig) GetGitUser(userName GitUserName) (GitUser, bool) {
 }
 
 func (ic *IssuectlConfig) AddGitUser(user *GitUser) error {
-	ic.GitUsers[GitUserName(user.GitUserName)] = *user
+	ic.GitUsers[GitUserName(user.Name)] = *user
 	return ic.Save()
 }
 

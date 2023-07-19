@@ -25,9 +25,9 @@ type GitUserName string
 
 // GitUser holds config for git user
 type GitUser struct {
-	GitUserName GitUserName `json:"name"`
-	Email       string      `json:"email"`
-	SSHKey      string      `json:"sshKey"`
+	Name   GitUserName
+	Email  string
+	SSHKey string
 }
 
 // RepoURL is a string with URL to git repo for cloning

@@ -17,7 +17,7 @@ func cloneRepo(repo *RepoConfig, dir string, gitUser *GitUser) (string, error) {
 		return "", err
 	}
 
-	if err := setRepoIdentity(repoDir, gitUser.GitUserName, gitUser.Email, gitUser.SSHKey); err != nil {
+	if err := setRepoIdentity(repoDir, gitUser.Name, gitUser.Email, gitUser.SSHKey); err != nil {
 		return "", err
 	}
 
@@ -28,7 +28,7 @@ func cloneRepo(repo *RepoConfig, dir string, gitUser *GitUser) (string, error) {
 // It creates a new git branch with the specified name in the specified directory.
 // It returns any error encountered during the branch creation process.
 func createBranch(dir, branchName string, gitUser *GitUser) error {
-	if err := setRepoIdentity(dir, gitUser.GitUserName, gitUser.Email, gitUser.SSHKey); err != nil {
+	if err := setRepoIdentity(dir, gitUser.Name, gitUser.Email, gitUser.SSHKey); err != nil {
 		return err
 	}
 

@@ -194,7 +194,7 @@ func initGitUserListCommand(rootCmd *cobra.Command) {
 			w := tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', 0)
 			fmt.Fprintln(w, "NAME\tEMAIL\tSSH KEY\t")
 			for _, user := range issuectl.LoadConfig().GetGitUsers() {
-				fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t%v\t", user.GitUserName, user.Email, user.SSHKey))
+				fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t%v\t", user.Name, user.Email, user.SSHKey))
 			}
 			w.Flush()
 		},
@@ -211,9 +211,9 @@ func initGitUserAddCommand(rootCmd *cobra.Command) {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			conf := issuectl.LoadConfig()
 			gitUser := &issuectl.GitUser{
-				GitUserName: issuectl.GitUserName(args[0]),
-				Email:       args[1],
-				SSHKey:      args[2],
+				Name:   issuectl.GitUserName(args[0]),
+				Email:  args[1],
+				SSHKey: args[2],
 			}
 			return conf.AddGitUser(gitUser)
 		},
