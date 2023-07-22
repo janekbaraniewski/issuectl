@@ -25,7 +25,7 @@ func isSubdir(baseDir, checkDir string) (string, error) {
 	return relativePath, nil
 }
 
-func getIssueIDFromParentDirectory(config *issuectl.IssuectlConfig) string {
+func getIssueIDFromParentDirectory(config issuectl.IssuectlConfig) string {
 	profile := config.GetProfile(config.GetCurrentProfile())
 	dir, err := os.Getwd()
 	if err != nil {

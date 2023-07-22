@@ -31,17 +31,56 @@ var DefaultConfigFilePath = getDefaultConfigFilePath()
 var DefaultSSHKeyPath = getDefaultSSHKeyPath()
 
 // IssuectlConfig manages configuration
-type IssuectlConfig struct {
-	CurrentProfile ProfileName                         `json:"currentProfile"`
-	Repositories   map[RepoConfigName]RepoConfig       `json:"repositories"`
-	Issues         map[IssueID]IssueConfig             `json:"issues"`
-	Profiles       map[ProfileName]Profile             `json:"profiles"`
-	Backends       map[BackendConfigName]BackendConfig `json:"backends"`
-	GitUsers       map[GitUserName]GitUser             `json:"gitUsers"`
-	Save           func() error
+type issuectlConfig struct {
+	CurrentProfile     ProfileName                          `json:"currentProfile"`
+	Repositories       map[RepoConfigName]*RepoConfig       `json:"repositories"`
+	Issues             map[IssueID]*IssueConfig             `json:"issues"`
+	Profiles           map[ProfileName]*Profile             `json:"profiles"`
+	Backends           map[BackendConfigName]*BackendConfig `json:"backends"`
+	GitUsers           map[GitUserName]*GitUser             `json:"gitUsers"`
+	PersistanceHandler func() error
 }
 
-var persistentFlagHandle = func(c *IssuectlConfig) error {
+type IssuectlConfig interface {
+	GetInMemory() IssuectlConfig
+	GetPersistent() IssuectlConfig
+
+	// Profile
+	AddProfile(*Profile) error
+	DeleteProfile(profileName ProfileName) error
+	GetCurrentProfile() ProfileName
+	GetProfile(ProfileName) *Profile
+	GetProfiles() map[ProfileName]*Profile
+	UpdateProfile(*Profile) error
+	UseProfile(profile ProfileName) error
+
+	// Issues
+	AddIssue(issueConfig *IssueConfig) error
+	DeleteIssue(issueID IssueID) error
+	GetIssue(IssueID) (*IssueConfig, bool)
+	GetIssues() map[IssueID]*IssueConfig
+
+	// Repositories
+	AddRepository(repoConfig *RepoConfig) error
+	GetRepository(name RepoConfigName) *RepoConfig
+	GetRepositories() map[RepoConfigName]*RepoConfig
+
+	// Backends
+	AddBackend(backend *BackendConfig) error
+	DeleteBackend(backendName BackendConfigName) error
+	GetBackend(backendName BackendConfigName) *BackendConfig
+	GetBackends() map[BackendConfigName]*BackendConfig
+
+	// GitUsers
+	AddGitUser(user *GitUser) error
+	DeleteGitUser(userName GitUserName) error
+	GetGitUser(userName GitUserName) (*GitUser, bool)
+	GetGitUsers() map[GitUserName]*GitUser
+
+	Save() error // TODO: this shouldn't be exposed
+}
+
+var persistentFlagHandle = func(c IssuectlConfig) error {
 	y, err := yaml.Marshal(c)
 	if err != nil {
 		return err
@@ -64,10 +103,10 @@ var persistentFlagHandle = func(c *IssuectlConfig) error {
 	return nil
 }
 
-var inMemoryFlagHandle = func(_ *IssuectlConfig) error { return nil }
+var inMemoryFlagHandle = func(_ IssuectlConfig) error { return nil }
 
-func LoadConfig() *IssuectlConfig {
-	config := &IssuectlConfig{}
+func LoadConfig() IssuectlConfig {
+	config := &issuectlConfig{}
 
 	data, err := os.ReadFile(DefaultConfigFilePath)
 	if err != nil {
@@ -89,122 +128,139 @@ func LoadConfig() *IssuectlConfig {
 	return config
 }
 
-func (ic *IssuectlConfig) GetPersistent() *IssuectlConfig {
-	ic.Save = func() error { return persistentFlagHandle(ic) }
+func GetEmptyConfig() IssuectlConfig {
+	return &issuectlConfig{}
+}
+
+func GetConfig(cn ProfileName, r map[RepoConfigName]*RepoConfig, b map[BackendConfigName]*BackendConfig, gu map[GitUserName]*GitUser, p map[ProfileName]*Profile) IssuectlConfig {
+	return &issuectlConfig{
+		CurrentProfile: cn,
+		Repositories:   r,
+		Profiles:       p,
+		Backends:       b,
+		GitUsers:       gu,
+	}
+}
+
+func (ic *issuectlConfig) Save() error {
+	return ic.PersistanceHandler()
+}
+
+func (ic *issuectlConfig) GetPersistent() IssuectlConfig {
+	ic.PersistanceHandler = func() error { return persistentFlagHandle(ic) }
 	return ic
 }
 
-func (ic *IssuectlConfig) GetInMemory() *IssuectlConfig {
-	ic.Save = func() error { return inMemoryFlagHandle(ic) }
+func (ic *issuectlConfig) GetInMemory() IssuectlConfig {
+	ic.PersistanceHandler = func() error { return inMemoryFlagHandle(ic) }
 	return ic
 }
 
 // Issues
 
-func (ic *IssuectlConfig) AddIssue(issueConfig *IssueConfig) error {
-	ic.Issues[issueConfig.ID] = *issueConfig
+func (ic *issuectlConfig) AddIssue(issueConfig *IssueConfig) error {
+	ic.Issues[issueConfig.ID] = issueConfig
 	return ic.Save()
 }
 
-func (ic *IssuectlConfig) DeleteIssue(issueID IssueID) error {
+func (ic *issuectlConfig) DeleteIssue(issueID IssueID) error {
 	delete(ic.Issues, issueID)
 	return ic.Save()
 }
 
-func (ic *IssuectlConfig) GetIssue(issueID IssueID) (IssueConfig, bool) {
+func (ic *issuectlConfig) GetIssue(issueID IssueID) (*IssueConfig, bool) {
 	issue, ok := ic.Issues[issueID]
 	return issue, ok
 }
 
-// Repositories
-
-func (ic *IssuectlConfig) ListRepositories() error {
-	Log.Infof("%v", ic.Repositories)
-	return nil
+func (ic *issuectlConfig) GetIssues() map[IssueID]*IssueConfig {
+	return ic.Issues
 }
 
-func (ic *IssuectlConfig) GetRepository(name RepoConfigName) RepoConfig {
+// Repositories
+
+func (ic *issuectlConfig) GetRepository(name RepoConfigName) *RepoConfig {
 	return ic.Repositories[name]
 }
 
-func (ic *IssuectlConfig) AddRepository(repoConfig *RepoConfig) error {
-	ic.Repositories[repoConfig.Name] = *repoConfig
+func (ic *issuectlConfig) AddRepository(repoConfig *RepoConfig) error {
+	ic.Repositories[repoConfig.Name] = repoConfig
 	return ic.Save()
+}
+
+func (ic *issuectlConfig) GetRepositories() map[RepoConfigName]*RepoConfig {
+	return ic.Repositories
 }
 
 // Profiles
 
-func (ic *IssuectlConfig) GetProfile(profileName ProfileName) Profile {
+func (ic *issuectlConfig) GetProfile(profileName ProfileName) *Profile {
 	return ic.Profiles[profileName]
 }
 
-func (ic *IssuectlConfig) AddProfile(profile *Profile) error {
-	ic.Profiles[profile.Name] = *profile
+func (ic *issuectlConfig) AddProfile(profile *Profile) error {
+	ic.Profiles[profile.Name] = profile
 	return ic.Save()
 }
 
-func (ic *IssuectlConfig) DeleteProfile(profileName ProfileName) error {
+func (ic *issuectlConfig) DeleteProfile(profileName ProfileName) error {
 	delete(ic.Profiles, profileName)
 	return ic.Save()
 }
 
-func (ic *IssuectlConfig) GetCurrentProfile() ProfileName {
+func (ic *issuectlConfig) GetCurrentProfile() ProfileName {
 	return ic.CurrentProfile
 }
 
-func (ic *IssuectlConfig) UseProfile(profile ProfileName) error {
+func (ic *issuectlConfig) UseProfile(profile ProfileName) error {
 	ic.CurrentProfile = profile
 	return ic.Save()
 }
 
-func (ic *IssuectlConfig) GetProfiles() map[ProfileName]Profile {
+func (ic *issuectlConfig) GetProfiles() map[ProfileName]*Profile {
 	return ic.Profiles
 }
 
-func (ic *IssuectlConfig) UpdateProfile(profile *Profile) error {
-	ic.Profiles[profile.Name] = *profile
+func (ic *issuectlConfig) UpdateProfile(profile *Profile) error {
+	ic.Profiles[profile.Name] = profile
 	return ic.Save()
 }
 
 // Backends
-func (ic *IssuectlConfig) GetBackend(backendName BackendConfigName) BackendConfig {
+func (ic *issuectlConfig) GetBackend(backendName BackendConfigName) *BackendConfig {
 	return ic.Backends[backendName]
 }
 
-func (ic *IssuectlConfig) AddBackend(backend *BackendConfig) error {
-	ic.Backends[backend.Name] = *backend
+func (ic *issuectlConfig) AddBackend(backend *BackendConfig) error {
+	ic.Backends[backend.Name] = backend
 	return ic.Save()
 }
 
-func (ic *IssuectlConfig) DeleteBackend(backendName BackendConfigName) error {
+func (ic *issuectlConfig) DeleteBackend(backendName BackendConfigName) error {
 	delete(ic.Backends, backendName)
 	return ic.Save()
 }
 
-func (ic *IssuectlConfig) GetBackends() map[BackendConfigName]BackendConfig {
+func (ic *issuectlConfig) GetBackends() map[BackendConfigName]*BackendConfig {
 	return ic.Backends
 }
 
-func (ic *IssuectlConfig) GetRepositories() map[RepoConfigName]RepoConfig {
-	return ic.Repositories
-}
-
 // GitUsers
-func (ic *IssuectlConfig) GetGitUser(userName GitUserName) (GitUser, bool) {
+func (ic *issuectlConfig) GetGitUser(userName GitUserName) (*GitUser, bool) {
 	gitUser, exists := ic.GitUsers[userName]
 	return gitUser, exists
 }
 
-func (ic *IssuectlConfig) AddGitUser(user *GitUser) error {
-	ic.GitUsers[GitUserName(user.Name)] = *user
+func (ic *issuectlConfig) AddGitUser(user *GitUser) error {
+	ic.GitUsers[GitUserName(user.Name)] = user
 	return ic.Save()
 }
 
-func (ic *IssuectlConfig) DeleteGitUser(userName GitUserName) error {
+func (ic *issuectlConfig) DeleteGitUser(userName GitUserName) error {
 	delete(ic.GitUsers, userName)
 	return ic.Save()
 }
 
-func (ic *IssuectlConfig) GetGitUsers() map[GitUserName]GitUser {
+func (ic *issuectlConfig) GetGitUsers() map[GitUserName]*GitUser {
 	return ic.GitUsers
 }

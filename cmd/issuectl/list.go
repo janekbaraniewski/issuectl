@@ -15,15 +15,16 @@ func initListIssuesCommand(rootCmd *cobra.Command) {
 		Use:   "list",
 		Short: "List all issues",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			config := issuectl.LoadConfig() // Load your configuration here
-			if len(config.Issues) == 0 {
+			issues := issuectl.LoadConfig().GetIssues() // Load your configuration here
+
+			if len(issues) == 0 {
 				fmt.Println("No issues found.")
 				return nil
 			}
 
 			w := tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', 0)
 			fmt.Fprintln(w, "ID\tName\tBackend\tBranch\tRepositories\tProfile\t")
-			for issueID, issue := range config.Issues {
+			for issueID, issue := range issues {
 				fmt.Fprintf(w, "%v\t%v\t%v\t%v\t%v\t%v\t\n", issueID, issue.Name, issue.BackendName, issue.BranchName, issue.Repositories, issue.Profile)
 			}
 			w.Flush()

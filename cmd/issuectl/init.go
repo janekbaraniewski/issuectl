@@ -186,21 +186,21 @@ func initInitConfigCommand(rootCmd *cobra.Command) {
 			profile.Backend = backend.Name
 			profile.DefaultRepository = repo.Name
 
-			config := issuectl.IssuectlConfig{
-				CurrentProfile: profile.Name,
-				Repositories: map[issuectl.RepoConfigName]issuectl.RepoConfig{
-					repo.Name: repo,
+			config := issuectl.GetConfig(
+				profile.Name,
+				map[issuectl.RepoConfigName]*issuectl.RepoConfig{
+					repo.Name: &repo,
 				},
-				Backends: map[issuectl.BackendConfigName]issuectl.BackendConfig{
-					backend.Name: backend,
+				map[issuectl.BackendConfigName]*issuectl.BackendConfig{
+					backend.Name: &backend,
 				},
-				GitUsers: map[issuectl.GitUserName]issuectl.GitUser{
-					gitUser.Name: gitUser,
+				map[issuectl.GitUserName]*issuectl.GitUser{
+					gitUser.Name: &gitUser,
 				},
-				Profiles: map[issuectl.ProfileName]issuectl.Profile{
-					profile.Name: profile,
+				map[issuectl.ProfileName]*issuectl.Profile{
+					profile.Name: &profile,
 				},
-			}
+			)
 
 			return config.GetPersistent().Save()
 		},
