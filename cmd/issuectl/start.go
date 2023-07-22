@@ -9,6 +9,31 @@ import (
 
 var Flags issuectl.CLIOverwrites
 
+func MergeConfigWithOverwrites(conf issuectl.IssuectlConfig, overwrites *issuectl.CLIOverwrites) issuectl.IssuectlConfig {
+	conf = conf.GetInMemory()
+
+	if overwrites.Profile != "" {
+		conf.UseProfile(issuectl.ProfileName(overwrites.Profile))
+	}
+
+	overwriteProfile := conf.GetProfile(conf.GetCurrentProfile())
+	if overwrites.Backend != "" {
+		overwriteProfile.Backend = issuectl.BackendConfigName(overwrites.Profile)
+	}
+	if overwrites.Repos != nil {
+		repos := []issuectl.RepoConfigName{}
+
+		for _, repoName := range overwrites.Repos {
+			repos = append(repos, issuectl.RepoConfigName(repoName))
+		}
+
+		overwriteProfile.Repositories = repos
+	}
+
+	conf.UpdateProfile(overwriteProfile)
+	return conf
+}
+
 func initStartCommand(rootCmd *cobra.Command) {
 	startCmd := &cobra.Command{
 		Use:                "start [issue number]",
@@ -23,6 +48,7 @@ func initStartCommand(rootCmd *cobra.Command) {
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			config := issuectl.LoadConfig()
+			config = MergeConfigWithOverwrites(config, &Flags)
 			if err := issuectl.StartWorkingOnIssue(config, &Flags, issuectl.IssueID(args[0])); err != nil {
 				issuectl.Log.Infof("Error!! -> %v", err)
 				return err

@@ -58,7 +58,7 @@ func StartWorkingOnIssue(config IssuectlConfig, overwrites *CLIOverwrites, issue
 	profile := config.GetProfile(config.GetCurrentProfile())
 	repositories := []string{}
 	for _, repoName := range profile.Repositories {
-		repositories = append(repositories, string(*repoName))
+		repositories = append(repositories, string(repoName))
 	}
 
 	if isIssueIdInUse(config, issueID) {
