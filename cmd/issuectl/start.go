@@ -2,6 +2,7 @@ package cli
 
 import (
 	"errors"
+	"fmt"
 
 	issuectl "github.com/janekbaraniewski/issuectl/pkg"
 	"github.com/spf13/cobra"
@@ -9,14 +10,19 @@ import (
 
 var Flags issuectl.CLIOverwrites
 
-func MergeConfigWithOverwrites(conf issuectl.IssuectlConfig, overwrites *issuectl.CLIOverwrites) issuectl.IssuectlConfig {
+func MergeConfigWithOverwrites(conf issuectl.IssuectlConfig, overwrites *issuectl.CLIOverwrites) (issuectl.IssuectlConfig, error) {
 	conf = conf.GetInMemory()
 
 	if overwrites.Profile != "" {
-		conf.UseProfile(issuectl.ProfileName(overwrites.Profile))
+		if err := conf.UseProfile(issuectl.ProfileName(overwrites.Profile)); err != nil {
+			return conf, err
+		}
 	}
 
 	overwriteProfile := conf.GetProfile(conf.GetCurrentProfile())
+	if overwriteProfile == nil {
+		return conf, fmt.Errorf("Failed - profile %v not defined.", overwrites.Profile)
+	}
 	if overwrites.Backend != "" {
 		overwriteProfile.Backend = issuectl.BackendConfigName(overwrites.Profile)
 	}
@@ -31,7 +37,7 @@ func MergeConfigWithOverwrites(conf issuectl.IssuectlConfig, overwrites *issuect
 	}
 
 	conf.UpdateProfile(overwriteProfile)
-	return conf
+	return conf, nil
 }
 
 func initStartCommand(rootCmd *cobra.Command) {
@@ -47,8 +53,10 @@ func initStartCommand(rootCmd *cobra.Command) {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			config := issuectl.LoadConfig()
-			config = MergeConfigWithOverwrites(config, &Flags)
+			config, err := MergeConfigWithOverwrites(issuectl.LoadConfig(), &Flags)
+			if err != nil {
+				return err
+			}
 			if err := issuectl.StartWorkingOnIssue(config, &Flags, issuectl.IssueID(args[0])); err != nil {
 				issuectl.Log.Infof("Error!! -> %v", err)
 				return err
