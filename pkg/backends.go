@@ -16,10 +16,12 @@ func getIssueNumberFromString(issueID IssueID) (int, error) {
 }
 
 type IssueBackend interface {
-	IssueExists(owner string, repo RepoConfigName, issueID IssueID) (bool, error)
 	LinkIssueToRepo(owner string, repo RepoConfigName, issueID IssueID, pullRequestID string) error
 	CloseIssue(owner string, repo RepoConfigName, issueID IssueID) error
 	GetIssue(owner string, repo RepoConfigName, issueID IssueID) (interface{}, error)
+
+	// Deprecated
+	IssueExists(owner string, repo RepoConfigName, issueID IssueID) (bool, error)
 }
 
 type RepositoryBackend interface {
@@ -46,6 +48,8 @@ func GetIssueBackend(conf *GetBackendConfig) IssueBackend {
 			conf.GitLabToken,
 			conf.GitLabApi,
 		)
+	case BackendJira:
+		return NewJiraBackend()
 	}
 	return nil
 }

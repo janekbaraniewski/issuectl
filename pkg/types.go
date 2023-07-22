@@ -7,6 +7,7 @@ type BackendType string
 const (
 	BackendGithub BackendType = "github"
 	BackendGitLab BackendType = "gitlab"
+	BackendJira   BackendType = "jira"
 )
 
 // BackendConfigName is a name of instance of BackendConfig
