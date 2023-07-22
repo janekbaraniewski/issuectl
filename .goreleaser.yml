@@ -14,7 +14,7 @@ archives:
     builds:
       - issuectl
     format: binary
-    name_template: '{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}'
+    name_template: '{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}-{{ .Version }}'
 brews:
   - name: issuectl
     ids:
