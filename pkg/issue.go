@@ -19,7 +19,7 @@ const (
 )
 
 // decodeBackendToken decodes backend token from base64
-func decodeBackendToken(backendConfig BackendConfig) (string, error) {
+func decodeBackendToken(backendConfig *BackendConfig) (string, error) {
 	ghToken, err := base64.RawStdEncoding.DecodeString(backendConfig.Token)
 	if err != nil {
 		return "", err
@@ -28,7 +28,7 @@ func decodeBackendToken(backendConfig BackendConfig) (string, error) {
 }
 
 // getIssueBackendConfigurator prepares IssueBackend
-func getIssueBackendConfigurator(backendConfig BackendConfig) (IssueBackend, error) {
+func getIssueBackendConfigurator(backendConfig *BackendConfig) (IssueBackend, error) {
 	ghToken, err := decodeBackendToken(backendConfig)
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func getIssueBackendConfigurator(backendConfig BackendConfig) (IssueBackend, err
 }
 
 // getRepoBackendConfigurator prepares RepositoryBackend
-func getRepoBackendConfigurator(backendConfig BackendConfig) (RepositoryBackend, error) {
+func getRepoBackendConfigurator(backendConfig *BackendConfig) (RepositoryBackend, error) {
 	ghToken, err := decodeBackendToken(backendConfig)
 	if err != nil {
 		return nil, err
@@ -54,7 +54,7 @@ func getRepoBackendConfigurator(backendConfig BackendConfig) (RepositoryBackend,
 }
 
 // StartWorkingOnIssue starts work on an issue
-func StartWorkingOnIssue(config *IssuectlConfig, overwrites *CLIOverwrites, issueID IssueID) error {
+func StartWorkingOnIssue(config IssuectlConfig, overwrites *CLIOverwrites, issueID IssueID) error {
 	profile := config.GetProfile(config.GetCurrentProfile())
 	repositories := []string{}
 	for _, repoName := range profile.Repositories {
@@ -67,17 +67,17 @@ func StartWorkingOnIssue(config *IssuectlConfig, overwrites *CLIOverwrites, issu
 
 	Log.Infof("Starting work on issue %v ...", issueID)
 
-	issueBackend, issueDirPath, err := initializeIssueBackendAndDir(config, &profile, issueID)
+	issueBackend, issueDirPath, err := initializeIssueBackendAndDir(config, profile, issueID)
 	if err != nil {
 		return err
 	}
 
-	issue, branchName, err := getIssueAndBranchName(config, issueBackend, &profile, issueID)
+	issue, branchName, err := getIssueAndBranchName(config, issueBackend, profile, issueID)
 	if err != nil {
 		return err
 	}
 
-	newIssue, err := createAndAddRepositoriesToIssue(config, &profile, issueID, issueDirPath, branchName, issue, repositories)
+	newIssue, err := createAndAddRepositoriesToIssue(config, profile, issueID, issueDirPath, branchName, issue, repositories)
 	if err != nil {
 		return err
 	}
@@ -91,13 +91,13 @@ func StartWorkingOnIssue(config *IssuectlConfig, overwrites *CLIOverwrites, issu
 }
 
 // isIssueIdInUse checks if issue ID is already in use
-func isIssueIdInUse(config *IssuectlConfig, issueID IssueID) bool {
+func isIssueIdInUse(config IssuectlConfig, issueID IssueID) bool {
 	_, found := config.GetIssue(issueID)
 	return found
 }
 
 // initializeIssueBackendAndDir prepares IssueBackend and creates directory for issue
-func initializeIssueBackendAndDir(config *IssuectlConfig, profile *Profile, issueID IssueID) (IssueBackend, string, error) {
+func initializeIssueBackendAndDir(config IssuectlConfig, profile *Profile, issueID IssueID) (IssueBackend, string, error) {
 	backendConfig := config.GetBackend(profile.Backend)
 	issueBackend, err := getIssueBackendConfigurator(backendConfig)
 	if err != nil {
@@ -119,7 +119,7 @@ func initializeIssueBackendAndDir(config *IssuectlConfig, profile *Profile, issu
 }
 
 // getIssueAndBranchName gets issue and prepares branch name
-func getIssueAndBranchName(config *IssuectlConfig, issueBackend IssueBackend, profile *Profile, issueID IssueID) (interface{}, string, error) {
+func getIssueAndBranchName(config IssuectlConfig, issueBackend IssueBackend, profile *Profile, issueID IssueID) (interface{}, string, error) {
 	repo := config.GetRepository(profile.DefaultRepository)
 	issue, err := issueBackend.GetIssue(repo.Owner, repo.Name, issueID)
 	if err != nil {
@@ -131,7 +131,7 @@ func getIssueAndBranchName(config *IssuectlConfig, issueBackend IssueBackend, pr
 }
 
 // createAndAddRepositoriesToIssue prepares issue and clones repositories to it
-func createAndAddRepositoriesToIssue(config *IssuectlConfig, profile *Profile, issueID IssueID, issueDirPath string, branchName string, issue interface{}, repositories []string) (*IssueConfig, error) {
+func createAndAddRepositoriesToIssue(config IssuectlConfig, profile *Profile, issueID IssueID, issueDirPath string, branchName string, issue interface{}, repositories []string) (*IssueConfig, error) {
 	newIssue := &IssueConfig{
 		Name:        *issue.(*github.Issue).Title,
 		ID:          issueID,
@@ -152,19 +152,19 @@ func createAndAddRepositoriesToIssue(config *IssuectlConfig, profile *Profile, i
 }
 
 // cloneAndAddRepositoryToIssue clones repository and adds it to issue
-func cloneAndAddRepositoryToIssue(config *IssuectlConfig, profile *Profile, issue *IssueConfig, issueDirPath string, branchName string, repoName string) error {
+func cloneAndAddRepositoryToIssue(config IssuectlConfig, profile *Profile, issue *IssueConfig, issueDirPath string, branchName string, repoName string) error {
 	gitUser, _ := config.GetGitUser(profile.GitUserName)
 	repo := config.GetRepository(RepoConfigName(repoName))
 
 	Log.Infof("Cloning repo %v", repo.Name)
 
-	repoDirPath, err := cloneRepo(&repo, issueDirPath, &gitUser)
+	repoDirPath, err := cloneRepo(repo, issueDirPath, gitUser)
 	if err != nil {
 		return err
 	}
 
 	Log.V(2).Infof("Creating branch")
-	if err := createBranch(repoDirPath, branchName, &gitUser); err != nil {
+	if err := createBranch(repoDirPath, branchName, gitUser); err != nil {
 		return err
 	}
 

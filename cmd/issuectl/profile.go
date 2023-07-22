@@ -122,7 +122,7 @@ func initProfileAddRepoCommand(rootCmd *cobra.Command) {
 			repoName := args[0]
 			profile := config.GetProfile(config.GetCurrentProfile())
 			profile.AddRepository((*issuectl.RepoConfigName)(&repoName))
-			if err := config.UpdateProfile(&profile); err != nil {
+			if err := config.UpdateProfile(profile); err != nil {
 				return err
 			}
 
