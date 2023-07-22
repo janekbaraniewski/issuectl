@@ -21,7 +21,6 @@ func initFinishCommand(rootCmd *cobra.Command) {
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := issuectl.FinishWorkingOnIssue(issuectl.IssueID(args[0])); err != nil {
-				issuectl.Log.Infof("Error!! -> %v", err)
 				return err
 			}
 

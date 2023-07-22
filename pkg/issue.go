@@ -155,6 +155,9 @@ func createAndAddRepositoriesToIssue(config IssuectlConfig, profile *Profile, is
 func cloneAndAddRepositoryToIssue(config IssuectlConfig, profile *Profile, issue *IssueConfig, issueDirPath string, branchName string, repoName string) error {
 	gitUser, _ := config.GetGitUser(profile.GitUserName)
 	repo := config.GetRepository(RepoConfigName(repoName))
+	if repo == nil {
+		return fmt.Errorf("Repo %v not defined.", repoName)
+	}
 
 	Log.Infof("Cloning repo %v", repo.Name)
 
@@ -200,7 +203,7 @@ func OpenPullRequest(issueID IssueID) error {
 
 // FinishWorkingOnIssue finishes work on an issue
 func FinishWorkingOnIssue(issueID IssueID) error {
-	config := LoadConfig()
+	config := LoadConfig().GetPersistent()
 	profile := config.GetProfile(config.GetCurrentProfile())
 	repo := config.GetRepository(profile.DefaultRepository)
 

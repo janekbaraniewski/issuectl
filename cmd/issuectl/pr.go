@@ -59,7 +59,6 @@ func initOpenPullRequestCommand(rootCmd *cobra.Command) {
 			}
 			err := issuectl.OpenPullRequest(issuectl.IssueID(issueID))
 			if err != nil {
-				issuectl.Log.Infof("Error!! -> %v", err)
 				return err
 			}
 			return nil
