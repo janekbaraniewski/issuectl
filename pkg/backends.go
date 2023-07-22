@@ -36,6 +36,7 @@ type GetBackendConfig struct {
 	GitLabApi    string
 	JiraUsername string
 	JiraToken    string
+	JiraHost     string
 }
 
 func GetIssueBackend(conf *GetBackendConfig) IssueBackend {
@@ -54,6 +55,7 @@ func GetIssueBackend(conf *GetBackendConfig) IssueBackend {
 		return NewJiraBackend(
 			conf.JiraUsername,
 			conf.JiraToken,
+			conf.JiraHost,
 		)
 	}
 	return nil
