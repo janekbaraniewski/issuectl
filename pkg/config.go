@@ -129,7 +129,13 @@ func LoadConfig() IssuectlConfig {
 }
 
 func GetEmptyConfig() IssuectlConfig {
-	return &issuectlConfig{}
+	return &issuectlConfig{
+		Repositories: map[RepoConfigName]*RepoConfig{},
+		Issues:       map[IssueID]*IssueConfig{},
+		Profiles:     map[ProfileName]*Profile{},
+		Backends:     map[BackendConfigName]*BackendConfig{},
+		GitUsers:     map[GitUserName]*GitUser{},
+	}
 }
 
 func GetConfig(cn ProfileName, r map[RepoConfigName]*RepoConfig, b map[BackendConfigName]*BackendConfig, gu map[GitUserName]*GitUser, p map[ProfileName]*Profile) IssuectlConfig {
