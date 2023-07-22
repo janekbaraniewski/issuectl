@@ -64,7 +64,6 @@ func initStartCommand(rootCmd *cobra.Command) {
 				return err
 			}
 			if err := issuectl.StartWorkingOnIssue(config, issuectl.IssueID(args[0])); err != nil {
-				issuectl.Log.Infof("Error!! -> %v", err)
 				return err
 			}
 
