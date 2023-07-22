@@ -182,7 +182,7 @@ func initInitConfigCommand(rootCmd *cobra.Command) {
 			}
 
 			profile.GitUserName = gitUser.Name
-			profile.AddRepository(&repo.Name)
+			profile.AddRepository(repo.Name)
 			profile.Backend = backend.Name
 			profile.DefaultRepository = repo.Name
 
