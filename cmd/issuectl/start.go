@@ -7,11 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	repoList    []string
-	profileName string
-	backendName string
-)
+var Flags issuectl.CLIOverwrites
 
 func initStartCommand(rootCmd *cobra.Command) {
 	startCmd := &cobra.Command{
@@ -27,7 +23,7 @@ func initStartCommand(rootCmd *cobra.Command) {
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			config := issuectl.LoadConfig()
-			if err := issuectl.StartWorkingOnIssue(config, repoList, issuectl.IssueID(args[0])); err != nil {
+			if err := issuectl.StartWorkingOnIssue(config, &Flags, issuectl.IssueID(args[0])); err != nil {
 				issuectl.Log.Infof("Error!! -> %v", err)
 				return err
 			}
@@ -37,7 +33,7 @@ func initStartCommand(rootCmd *cobra.Command) {
 	}
 
 	startCmd.PersistentFlags().StringSliceVarP(
-		&repoList,
+		&Flags.Repos,
 		"repos",
 		"r",
 		[]string{},
@@ -45,7 +41,7 @@ func initStartCommand(rootCmd *cobra.Command) {
 	)
 
 	startCmd.PersistentFlags().StringVarP(
-		&profileName,
+		&Flags.Profile,
 		"profile",
 		"p",
 		"",
@@ -53,7 +49,7 @@ func initStartCommand(rootCmd *cobra.Command) {
 	)
 
 	startCmd.PersistentFlags().StringVarP(
-		&backendName,
+		&Flags.Backend,
 		"backend",
 		"b",
 		"",

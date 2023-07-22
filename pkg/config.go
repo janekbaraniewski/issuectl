@@ -38,9 +38,10 @@ type IssuectlConfig struct {
 	Profiles       map[ProfileName]Profile             `json:"profiles"`
 	Backends       map[BackendConfigName]BackendConfig `json:"backends"`
 	GitUsers       map[GitUserName]GitUser             `json:"gitUsers"`
+	Save           func() error
 }
 
-func (c *IssuectlConfig) Save() error {
+var persistentFlagHandle = func(c *IssuectlConfig) error {
 	y, err := yaml.Marshal(c)
 	if err != nil {
 		return err
@@ -61,8 +62,9 @@ func (c *IssuectlConfig) Save() error {
 		log.Fatalf("error: %v", err)
 	}
 	return nil
-
 }
+
+var inMemoryFlagHandle = func(_ *IssuectlConfig) error { return nil }
 
 func LoadConfig() *IssuectlConfig {
 	config := &IssuectlConfig{}
@@ -85,6 +87,16 @@ func LoadConfig() *IssuectlConfig {
 	}
 
 	return config
+}
+
+func (ic *IssuectlConfig) GetPersistent() *IssuectlConfig {
+	ic.Save = func() error { return persistentFlagHandle(ic) }
+	return ic
+}
+
+func (ic *IssuectlConfig) GetInMemory() *IssuectlConfig {
+	ic.Save = func() error { return inMemoryFlagHandle(ic) }
+	return ic
 }
 
 // Issues

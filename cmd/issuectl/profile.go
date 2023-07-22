@@ -58,7 +58,7 @@ func initProfileAddCommand(rootCmd *cobra.Command) {
 			profileName := args[0]
 			workDir := args[1]
 			repos := []*issuectl.RepoConfigName{}
-			for _, repoName := range repoList {
+			for _, repoName := range Flags.Repos {
 				repos = append(repos, (*issuectl.RepoConfigName)(&repoName))
 			}
 			newProfile := &issuectl.Profile{
@@ -72,7 +72,7 @@ func initProfileAddCommand(rootCmd *cobra.Command) {
 	}
 
 	addCmd.PersistentFlags().StringSliceVarP(
-		&repoList,
+		&Flags.Repos,
 		"repos",
 		"r",
 		[]string{},
@@ -118,7 +118,7 @@ func initProfileAddRepoCommand(rootCmd *cobra.Command) {
 		Short: "Add a new repository to current profile",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			config := issuectl.LoadConfig()
+			config := issuectl.LoadConfig().GetPersistent()
 			repoName := args[0]
 			profile := config.GetProfile(config.GetCurrentProfile())
 			profile.AddRepository((*issuectl.RepoConfigName)(&repoName))
