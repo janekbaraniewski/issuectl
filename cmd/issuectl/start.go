@@ -48,7 +48,7 @@ func MergeConfigWithOverwrites(conf issuectl.IssuectlConfig, overwrites *CLIOver
 
 func initStartCommand(rootCmd *cobra.Command) {
 	startCmd := &cobra.Command{
-		Use:                "start [issue number]",
+		Use:                "start [issueID]",
 		Short:              "Start work on issue",
 		Long:               `Create issue work directory. Clone all repositories from current profile. Create branches.`,
 		FParseErrWhitelist: cobra.FParseErrWhitelist{UnknownFlags: true},
@@ -64,6 +64,7 @@ func initStartCommand(rootCmd *cobra.Command) {
 				return err
 			}
 			if err := issuectl.StartWorkingOnIssue(config, issuectl.IssueID(args[0])); err != nil {
+				// TODO: rollback changes made by StartWorkingOnIssue
 				return err
 			}
 

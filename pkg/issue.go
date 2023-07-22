@@ -13,7 +13,7 @@ import (
 const (
 	GitHubApi                    = "https://api.github.com/"
 	errIssueIDNotFound           = "issueID not found"
-	errIssueDoesNotExistOnGitHub = "issue does not exist on GitHub: %w"
+	errIssueDoesNotExistOnGitHub = "while looking for issue on GitHub: %w"
 	errFailedToCloseIssue        = "failed to close the issue: %w"
 	errFailedToGetIssue          = "failed to get the issue: %w"
 )
