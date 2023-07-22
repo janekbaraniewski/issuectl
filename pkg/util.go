@@ -12,6 +12,7 @@ import (
 // and returns the path of the new repository directory and any error encountered.
 func cloneRepo(repo *RepoConfig, dir string, gitUser *GitUser) (string, error) {
 	repoDir := filepath.Join(dir, string(repo.Name))
+	Log.V(3).Infof("git clone %v %v", repo.RepoURL, repoDir)
 	cmd := exec.Command("git", "clone", string(repo.RepoURL), repoDir)
 	if err := cmd.Run(); err != nil {
 		return "", err
@@ -32,12 +33,14 @@ func createBranch(dir, branchName string, gitUser *GitUser) error {
 		return err
 	}
 
+	Log.V(3).Infof("git checkout -b %v", branchName)
 	cmd := exec.Command("git", "checkout", "-b", branchName)
 	cmd.Dir = dir
 	if err := cmd.Run(); err != nil {
 		return err
 	}
 
+	Log.V(3).Infof("git push --set-upstream origin %v", branchName)
 	cmd = exec.Command("git", "push", "--set-upstream", "origin", branchName)
 	cmd.Dir = dir
 	return cmd.Run()
@@ -46,6 +49,7 @@ func createBranch(dir, branchName string, gitUser *GitUser) error {
 // setRepoIdentity sets local git config username, email and ssh command.
 func setRepoIdentity(dir string, username GitUserName, email, sshKeyPath string) error {
 	// Set local git config user.name
+	Log.V(3).Infof("git config user.name %v", username)
 	cmd := exec.Command("git", "config", "user.name", string(username))
 	cmd.Dir = dir
 	if err := cmd.Run(); err != nil {
@@ -53,6 +57,7 @@ func setRepoIdentity(dir string, username GitUserName, email, sshKeyPath string)
 	}
 
 	// Set local git config user.email
+	Log.V(3).Infof("git config user.email %v", email)
 	cmd = exec.Command("git", "config", "user.email", email)
 	cmd.Dir = dir
 	if err := cmd.Run(); err != nil {
@@ -61,6 +66,7 @@ func setRepoIdentity(dir string, username GitUserName, email, sshKeyPath string)
 
 	// Set local git config core.sshCommand
 	sshCommand := fmt.Sprintf("ssh -i %s -F /dev/null", sshKeyPath)
+	Log.V(3).Infof("git config core.sshCommand %v", sshCommand)
 	cmd = exec.Command("git", "config", "core.sshCommand", sshCommand)
 	cmd.Dir = dir
 	if err := cmd.Run(); err != nil {
