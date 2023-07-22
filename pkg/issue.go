@@ -54,7 +54,7 @@ func getRepoBackendConfigurator(backendConfig *BackendConfig) (RepositoryBackend
 }
 
 // StartWorkingOnIssue starts work on an issue
-func StartWorkingOnIssue(config IssuectlConfig, overwrites *CLIOverwrites, issueID IssueID) error {
+func StartWorkingOnIssue(config IssuectlConfig, issueID IssueID) error {
 	profile := config.GetProfile(config.GetCurrentProfile())
 	repositories := []string{}
 	for _, repoName := range profile.Repositories {

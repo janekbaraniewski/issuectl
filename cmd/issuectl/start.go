@@ -8,9 +8,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var Flags issuectl.CLIOverwrites
+type CLIOverwrites struct {
+	Repos   []string
+	Profile string
+	Backend string
+}
 
-func MergeConfigWithOverwrites(conf issuectl.IssuectlConfig, overwrites *issuectl.CLIOverwrites) (issuectl.IssuectlConfig, error) {
+var Flags CLIOverwrites
+
+func MergeConfigWithOverwrites(conf issuectl.IssuectlConfig, overwrites *CLIOverwrites) (issuectl.IssuectlConfig, error) {
 	conf = conf.GetInMemory()
 
 	if overwrites.Profile != "" {
@@ -57,7 +63,7 @@ func initStartCommand(rootCmd *cobra.Command) {
 			if err != nil {
 				return err
 			}
-			if err := issuectl.StartWorkingOnIssue(config, &Flags, issuectl.IssueID(args[0])); err != nil {
+			if err := issuectl.StartWorkingOnIssue(config, issuectl.IssueID(args[0])); err != nil {
 				issuectl.Log.Infof("Error!! -> %v", err)
 				return err
 			}
