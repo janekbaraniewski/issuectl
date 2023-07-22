@@ -64,9 +64,3 @@ type IssueConfig struct {
 	Dir          string            `json:"dir"`
 	Profile      ProfileName       `json:"profile"`
 }
-
-type CLIOverwrites struct {
-	Repos   []string
-	Profile string
-	Backend string
-}
