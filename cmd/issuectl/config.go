@@ -82,7 +82,7 @@ func initBackendAddCommand(rootCmd *cobra.Command) {
 		Short: "Add a new backend",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			config := issuectl.LoadConfig()
+			config := issuectl.LoadConfig().GetPersistent()
 			backendName := args[0]
 			backendType := args[1]
 			newBackend := issuectl.BackendConfig{
@@ -102,7 +102,7 @@ func initBackendDeleteCommand(rootCmd *cobra.Command) {
 		Short: "Delete a backend",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			config := issuectl.LoadConfig()
+			config := issuectl.LoadConfig().GetPersistent()
 			backendName := args[0]
 			return config.DeleteBackend(issuectl.BackendConfigName(backendName))
 		},
@@ -156,7 +156,7 @@ func initRepoAddCommand(rootCmd *cobra.Command) {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			conf := issuectl.LoadConfig()
+			conf := issuectl.LoadConfig().GetPersistent()
 			repoConfig := &issuectl.RepoConfig{
 				Owner:   args[0],
 				Name:    issuectl.RepoConfigName(args[1]),
@@ -209,7 +209,7 @@ func initGitUserAddCommand(rootCmd *cobra.Command) {
 		Short: "Add a new Git user",
 		Args:  cobra.ExactArgs(3), // Expects exactly 3 arguments
 		RunE: func(cmd *cobra.Command, args []string) error {
-			conf := issuectl.LoadConfig()
+			conf := issuectl.LoadConfig().GetPersistent()
 			gitUser := &issuectl.GitUser{
 				Name:   issuectl.GitUserName(args[0]),
 				Email:  args[1],
