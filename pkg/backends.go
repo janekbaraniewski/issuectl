@@ -9,7 +9,7 @@ import (
 func getIssueNumberFromString(issueID IssueID) (int, error) {
 	issueNumber, err := strconv.Atoi(string(issueID))
 	if err != nil {
-		return 0, fmt.Errorf("invalid issue ID: %v", err)
+		return 0, fmt.Errorf("issueID has to be of type int")
 	}
 
 	return issueNumber, nil
