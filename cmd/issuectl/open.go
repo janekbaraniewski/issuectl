@@ -10,9 +10,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func initOpenIssueCommand(rootCmd *cobra.Command) {
+const CodeEditorVSCode string = "code"
+
+func initWorkonIssueCommand(rootCmd *cobra.Command) {
 	var openIssueCmd = &cobra.Command{
-		Use:   "open [issueID]", // TODO: this might be better called using different name? `open` sudgests that we'll open some issue in issue backend. maybe `work`?
+		Use:   "workon [issueID]", // TODO: this might be better called using different name? `open` sudgests that we'll open some issue in issue backend. maybe `work`?
 		Short: "Open specified issue in the preferred code editor",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -25,7 +27,7 @@ func initOpenIssueCommand(rootCmd *cobra.Command) {
 			}
 
 			// Open the preferred editor with the directory IssueConfig.Dir
-			openCmd := exec.Command("code", issue.Dir) // Change 'vim' to your preferred editor
+			openCmd := exec.Command(CodeEditorVSCode, issue.Dir) // Change 'code' to your preferred editor
 			openCmd.Stdin = os.Stdin
 			openCmd.Stdout = os.Stdout
 			err := openCmd.Run()
