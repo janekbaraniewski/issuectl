@@ -29,11 +29,13 @@ type RepositoryBackend interface {
 }
 
 type GetBackendConfig struct {
-	Type        BackendType
-	GitHubToken string
-	GitHubApi   string
-	GitLabToken string
-	GitLabApi   string
+	Type         BackendType
+	GitHubToken  string
+	GitHubApi    string
+	GitLabToken  string
+	GitLabApi    string
+	JiraUsername string
+	JiraToken    string
 }
 
 func GetIssueBackend(conf *GetBackendConfig) IssueBackend {
@@ -49,7 +51,10 @@ func GetIssueBackend(conf *GetBackendConfig) IssueBackend {
 			conf.GitLabApi,
 		)
 	case BackendJira:
-		return NewJiraBackend()
+		return NewJiraBackend(
+			conf.JiraUsername,
+			conf.JiraToken,
+		)
 	}
 	return nil
 }
