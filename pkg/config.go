@@ -32,13 +32,14 @@ var DefaultSSHKeyPath = getDefaultSSHKeyPath()
 
 // IssuectlConfig manages configuration
 type issuectlConfig struct {
-	CurrentProfile     ProfileName                          `json:"currentProfile"`
-	Repositories       map[RepoConfigName]*RepoConfig       `json:"repositories"`
-	Issues             map[IssueID]*IssueConfig             `json:"issues"`
-	Profiles           map[ProfileName]*Profile             `json:"profiles"`
-	Backends           map[BackendConfigName]*BackendConfig `json:"backends"`
-	GitUsers           map[GitUserName]*GitUser             `json:"gitUsers"`
-	PersistanceHandler func() error
+	CurrentProfile ProfileName                          `json:"currentProfile"`
+	Repositories   map[RepoConfigName]*RepoConfig       `json:"repositories"`
+	Issues         map[IssueID]*IssueConfig             `json:"issues"`
+	Profiles       map[ProfileName]*Profile             `json:"profiles"`
+	Backends       map[BackendConfigName]*BackendConfig `json:"backends"`
+	GitUsers       map[GitUserName]*GitUser             `json:"gitUsers"`
+
+	_persistenceMode string `json:"-"`
 }
 
 type IssuectlConfig interface {
@@ -149,16 +150,23 @@ func GetConfig(cn ProfileName, r map[RepoConfigName]*RepoConfig, b map[BackendCo
 }
 
 func (ic *issuectlConfig) Save() error {
-	return ic.PersistanceHandler()
+	switch ic._persistenceMode {
+	case "persistent":
+		return persistentFlagHandle(ic)
+	case "memory":
+		return inMemoryFlagHandle(ic)
+	}
+
+	return nil
 }
 
 func (ic *issuectlConfig) GetPersistent() IssuectlConfig {
-	ic.PersistanceHandler = func() error { return persistentFlagHandle(ic) }
+	ic._persistenceMode = "persistent"
 	return ic
 }
 
 func (ic *issuectlConfig) GetInMemory() IssuectlConfig {
-	ic.PersistanceHandler = func() error { return inMemoryFlagHandle(ic) }
+	ic._persistenceMode = "memory"
 	return ic
 }
 
