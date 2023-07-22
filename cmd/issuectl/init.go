@@ -202,7 +202,7 @@ func initInitConfigCommand(rootCmd *cobra.Command) {
 				},
 			}
 
-			return config.Save()
+			return config.GetPersistent().Save()
 		},
 	}
 	rootCmd.AddCommand(initCmd)
