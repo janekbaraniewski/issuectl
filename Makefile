@@ -6,7 +6,7 @@ PKG_SRC=$(shell find . -type f -name '*.go')
 GOOS=$(shell $(GOCMD) env GOOS)
 GOARCH=$(shell $(GOCMD) env GOARCH)
 
-BIN_NAME=issuectl-$(GOOS)-$(GOARCH) # -$(APP_VERSION)
+BIN_NAME=issuectl-$(GOOS)-$(GOARCH)-$(APP_VERSION)
 
 SHELL = /usr/bin/env bash -o pipefail
 .SHELLFLAGS = -ec
