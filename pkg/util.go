@@ -33,17 +33,46 @@ func createBranch(dir, branchName string, gitUser *GitUser) error {
 		return err
 	}
 
-	Log.V(3).Infof("git checkout -b %v", branchName)
-	cmd := exec.Command("git", "checkout", "-b", branchName)
-	cmd.Dir = dir
-	if err := cmd.Run(); err != nil {
+	exists, err := branchExists(dir, branchName)
+	if err != nil {
 		return err
 	}
 
-	Log.V(3).Infof("git push --set-upstream origin %v", branchName)
-	cmd = exec.Command("git", "push", "--set-upstream", "origin", branchName)
+	if exists {
+		Log.V(3).Infof("git checkout %v", branchName)
+		cmd := exec.Command("git", "checkout", branchName)
+		cmd.Dir = dir
+		if err := cmd.Run(); err != nil {
+			return err
+		}
+	} else {
+		Log.V(3).Infof("git checkout -b %v", branchName)
+		cmd := exec.Command("git", "checkout", "-b", branchName)
+		cmd.Dir = dir
+		if err := cmd.Run(); err != nil {
+			return err
+		}
+
+		Log.V(3).Infof("git push --set-upstream origin %v", branchName)
+		cmd = exec.Command("git", "push", "--set-upstream", "origin", branchName)
+		cmd.Dir = dir
+		if err := cmd.Run(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// branchExists checks if a branch exists in the repository located at dir.
+func branchExists(dir, branchName string) (bool, error) {
+	cmd := exec.Command("git", "branch", "--list", branchName)
 	cmd.Dir = dir
-	return cmd.Run()
+	output, err := cmd.Output()
+	if err != nil {
+		return false, err
+	}
+	return len(output) > 0, nil
 }
 
 // setRepoIdentity sets local git config username, email and ssh command.

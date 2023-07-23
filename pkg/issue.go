@@ -188,7 +188,7 @@ func OpenPullRequest(issueID IssueID) error {
 		return err
 	}
 
-	issueBackend, err := getIssueBackendConfigurator(config.GetBackend(profile.RepoBackend))
+	issueBackend, err := getIssueBackendConfigurator(config.GetBackend(profile.IssueBackend))
 	if err != nil {
 		return err
 	}
