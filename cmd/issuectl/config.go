@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"os"
@@ -77,6 +78,18 @@ func initBackendListCommand(rootCmd *cobra.Command) {
 }
 
 func initBackendAddCommand(rootCmd *cobra.Command) {
+	type _flags struct {
+		GitHubApi    string
+		GitHubToken  string
+		GitLabApi    string
+		GitLabToken  string
+		JiraHost     string
+		JiraToken    string
+		JiraUsername string
+	}
+
+	var flags *_flags = &_flags{}
+
 	addCmd := &cobra.Command{
 		Use:   "add [name] [config]",
 		Short: "Add a new backend",
@@ -84,14 +97,101 @@ func initBackendAddCommand(rootCmd *cobra.Command) {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			config := issuectl.LoadConfig().GetPersistent()
 			backendName := args[0]
-			backendType := args[1]
+			_backendType := args[1]
+
+			backendType := issuectl.BackendType(_backendType)
+
 			newBackend := issuectl.BackendConfig{
 				Name: issuectl.BackendConfigName(backendName),
-				Type: issuectl.BackendType(backendType),
+				Type: backendType,
+			}
+
+			switch backendType {
+
+			case issuectl.BackendGithub:
+				token := base64.RawStdEncoding.EncodeToString([]byte(flags.GitHubToken))
+				githubConfig := &issuectl.GitHubConfig{
+					Host:  flags.GitHubApi,
+					Token: token,
+				}
+				newBackend.GitHub = githubConfig
+
+			case issuectl.BackendGitLab:
+				token := base64.RawStdEncoding.EncodeToString([]byte(flags.GitLabToken))
+				gitlabConfig := &issuectl.GitLabConfig{
+					Host:  flags.GitLabApi,
+					Token: token,
+				}
+				newBackend.GitLab = gitlabConfig
+
+			case issuectl.BackendJira:
+				token := base64.RawStdEncoding.EncodeToString([]byte(flags.JiraToken))
+				jiraBackend := &issuectl.JiraConfig{
+					Host:     flags.JiraHost,
+					Token:    token,
+					Username: flags.JiraUsername,
+				}
+				newBackend.Jira = jiraBackend
 			}
 			return config.AddBackend(&newBackend)
 		},
 	}
+
+	addCmd.PersistentFlags().StringVarP(
+		&flags.GitHubApi,
+		"github-api",
+		"",
+		"https://api.github.com/",
+		"GitHub API URL",
+	)
+
+	addCmd.PersistentFlags().StringVarP(
+		&flags.GitHubToken,
+		"github-token",
+		"",
+		"",
+		"GitHub API Auth Token",
+	)
+
+	addCmd.PersistentFlags().StringVarP(
+		&flags.GitLabApi,
+		"gitlab-api",
+		"",
+		"",
+		"GitLab API URL",
+	)
+
+	addCmd.PersistentFlags().StringVarP(
+		&flags.GitLabToken,
+		"gitlab-token",
+		"",
+		"",
+		"GitLab API Token",
+	)
+
+	addCmd.PersistentFlags().StringVarP(
+		&flags.JiraHost,
+		"jira-host",
+		"",
+		"",
+		"Jira API URL",
+	)
+
+	addCmd.PersistentFlags().StringVarP(
+		&flags.JiraToken,
+		"jira-token",
+		"",
+		"",
+		"Jira API Token",
+	)
+
+	addCmd.PersistentFlags().StringVarP(
+		&flags.JiraUsername,
+		"jira-username",
+		"",
+		"",
+		"Jira API Username",
+	)
 
 	rootCmd.AddCommand(addCmd)
 }

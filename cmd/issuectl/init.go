@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"encoding/base64"
 	"fmt"
 	"os"
 
@@ -51,8 +50,7 @@ func askForGitUser() (issuectl.GitUser, error) {
 
 func askForBackend() (issuectl.BackendConfig, error) {
 	answers := struct {
-		Type  string
-		Token string
+		Type string
 	}{}
 	prompt := []*survey.Question{
 		{
@@ -63,21 +61,14 @@ func askForBackend() (issuectl.BackendConfig, error) {
 			},
 			Validate: survey.Required,
 		},
-		{
-			Name: "Token",
-			Prompt: &survey.Password{
-				Message: "Enter backend token:",
-			},
-			Validate: survey.Required,
-		},
 	}
 	if err := survey.Ask(prompt, &answers); err != nil {
 		return issuectl.BackendConfig{}, err
 	}
 	return issuectl.BackendConfig{
-		Name:  issuectl.BackendConfigName("default"),
-		Type:  issuectl.BackendType(answers.Type),
-		Token: base64.RawStdEncoding.EncodeToString([]byte(answers.Token)),
+		Name: issuectl.BackendConfigName("default"),
+		Type: issuectl.BackendType(answers.Type),
+		// Token: base64.RawStdEncoding.EncodeToString([]byte(answers.Token)),
 	}, nil
 }
 
