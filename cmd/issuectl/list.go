@@ -23,9 +23,9 @@ func initListIssuesCommand(rootCmd *cobra.Command) {
 			}
 
 			w := tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', 0)
-			fmt.Fprintln(w, "ID\tName\tBackend\tBranch\tRepositories\tProfile\t")
+			fmt.Fprintln(w, "ID\tName\tRepository Backend\tIssue Backend\tBranch\tRepositories\tProfile\t")
 			for issueID, issue := range issues {
-				fmt.Fprintf(w, "%v\t%v\t%v\t%v\t%v\t%v\t\n", issueID, issue.Name, issue.BackendName, issue.BranchName, issue.Repositories, issue.Profile)
+				fmt.Fprintf(w, "%v\t%v\t%v\t%v\t%v\t%v\t%v\t\n", issueID, issue.Name, issue.RepoBackend, issue.IssueBackend, issue.BranchName, issue.Repositories, issue.Profile)
 			}
 			w.Flush()
 

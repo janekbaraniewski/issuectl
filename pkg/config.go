@@ -113,7 +113,6 @@ func LoadConfig() IssuectlConfig {
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
 			if err := config.Save(); err != nil {
-				Log.Infof("%v", err)
 				return config
 			}
 			return config
@@ -122,7 +121,6 @@ func LoadConfig() IssuectlConfig {
 	}
 
 	if err = yaml.Unmarshal(data, config); err != nil {
-		Log.Infof("%v", err)
 		return nil
 	}
 
