@@ -6,13 +6,23 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/janekbaraniewski/issuectl)](https://goreportcard.com/report/github.com/janekbaraniewski/issuectl)
 [![Go Reference](https://pkg.go.dev/badge/github.com/janekbaraniewski/issuectl.svg)](https://pkg.go.dev/github.com/janekbaraniewski/issuectl)
 
-> # WARNING
-> this is still work in progress.
+> ❗️WIP❗️
 
 <img src="logo.png" alt="logo" width="200" />
 
-- gives you clean isolated space for each of your issues
-- helps you manage multiple git repositories and branches involved
+**Streamline your work on multiple repositories and issues simultaneously. This tool will:**
+
+- Maintain a clean work directory for each of your issues
+- When you start working on new issue it:
+  - Clones all repositories you need to separate directory
+  - Sets up branches in all repositories
+  - Changes status of issue in issue backend to In Progress
+- Then it allows you with just one command to:
+  - open Pull Request
+  - link it to issue
+- And when youre done it:
+  - cleanes up working directory
+  - sets issue to Done
 
 ## Install
 
@@ -122,15 +132,35 @@ Use "issuectl [command] --help" for more information about a command.
 In order to work on code you need to define your repositories:
 
 ```bash
-➜ issuectl repo add user repoName git@github.com:user/repoName.git
+➜ issuectl config repo add user repoName git@github.com:user/repoName.git
 ```
 
 ### Backends
 
-You'll also need to configure issue backend:
+You'll also need to configure issue backend. ATM there is GitHub and Jira backend and untested GitLab backend.
 
 ```bash
-➜ issuectl backend add github github
+➜ issuectl config backend add --help
+Add a new backend
+
+Usage:
+  issuectl config backend add [name] [type] [flags]
+
+Flags:
+      --github-api string      GitHub API URL (default "https://api.github.com/")
+      --github-token string    GitHub API Auth Token
+      --gitlab-api string      GitLab API URL
+      --gitlab-token string    GitLab API Token
+  -h, --help                   help for add
+      --jira-host string       Jira API URL
+      --jira-token string      Jira API Token
+      --jira-username string   Jira API Username
+```
+
+Let's configure GitGub backend as example:
+
+```bash
+➜ issuectl config backend add --github-token mysupersecrettoken example-github github
 ```
 
 ### Profiles
