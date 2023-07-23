@@ -154,7 +154,9 @@ func initInitConfigCommand(rootCmd *cobra.Command) {
 			prompt := &survey.Confirm{
 				Message: "Do you want to configure a backend?",
 			}
-			survey.AskOne(prompt, &configureBackend)
+			if err := survey.AskOne(prompt, &configureBackend); err != nil {
+				return err
+			}
 			if configureBackend {
 				backend, err = askForBackend()
 				if err != nil {
@@ -173,7 +175,11 @@ func initInitConfigCommand(rootCmd *cobra.Command) {
 			}
 
 			profile.GitUserName = gitUser.Name
-			profile.AddRepository(repo.Name)
+
+			if err := profile.AddRepository(repo.Name); err != nil {
+				return err
+			}
+
 			profile.IssueBackend = backend.Name
 			profile.RepoBackend = backend.Name
 			profile.DefaultRepository = repo.Name

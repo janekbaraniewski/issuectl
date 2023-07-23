@@ -169,14 +169,16 @@ func getBranchName(config IssuectlConfig, issueBackend IssueBackend, profile *Pr
 		return "", fmt.Errorf(errFailedToGetIssue, err)
 	}
 
-	switch issue.(type) {
+	switch t := issue.(type) {
 	default:
 		return "", fmt.Errorf("Missing issue type")
 	case *github.Issue:
+		Log.Infof("%v", t)
 		branchName := fmt.Sprintf("%v-%v", issueID, strings.ReplaceAll(*issue.(*github.Issue).Title, " ", "-"))
 		return branchName, nil
 	case *jira.Issue:
-		branchName := fmt.Sprintf("%v-%v", issueID, strings.ReplaceAll(*&issue.(*jira.Issue).Fields.Summary, " ", "-"))
+		Log.Infof("%v", t)
+		branchName := fmt.Sprintf("%v-%v", issueID, strings.ReplaceAll(issue.(*jira.Issue).Fields.Summary, " ", "-"))
 		return branchName, nil
 	}
 }

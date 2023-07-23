@@ -68,7 +68,7 @@ func initBackendListCommand(rootCmd *cobra.Command) {
 			w := tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', 0)
 			fmt.Fprintln(w, "NAME\tTYPE\t")
 			for _, backend := range issuectl.LoadConfig().GetBackends() {
-				fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t", backend.Name, backend.Type))
+				fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t", backend.Name, backend.Type)) //nolint:gosimple
 			}
 			w.Flush()
 		},
@@ -234,7 +234,7 @@ func initRepoListCommand(rootCmd *cobra.Command) {
 			w := tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', 0)
 			fmt.Fprintln(w, "NAME\tOWNER\tURL\t")
 			for _, repo := range issuectl.LoadConfig().GetRepositories() {
-				fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t%v\t", repo.Name, repo.Owner, repo.RepoURL))
+				fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t%v\t", repo.Name, repo.Owner, repo.RepoURL)) //nolint:gosimple
 			}
 			w.Flush()
 		},
@@ -294,7 +294,7 @@ func initGitUserListCommand(rootCmd *cobra.Command) {
 			w := tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', 0)
 			fmt.Fprintln(w, "NAME\tEMAIL\tSSH KEY\t")
 			for _, user := range issuectl.LoadConfig().GetGitUsers() {
-				fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t%v\t", user.Name, user.Email, user.SSHKey))
+				fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t%v\t", user.Name, user.Email, user.SSHKey)) //nolint:gosimple
 			}
 			w.Flush()
 		},
