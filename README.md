@@ -6,13 +6,10 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/janekbaraniewski/issuectl)](https://goreportcard.com/report/github.com/janekbaraniewski/issuectl)
 [![Go Reference](https://pkg.go.dev/badge/github.com/janekbaraniewski/issuectl.svg)](https://pkg.go.dev/github.com/janekbaraniewski/issuectl)
 
-> ❗️WIP❗️
+Streamline your work with multiple repositories, issues and git accounts simultaneously. This tool will
+----
 
-<img src="logo.png" alt="logo" width="200" />
-
-**Streamline your work on multiple repositories and issues simultaneously. This tool will:**
-
-- Maintain a clean work directory for each of your issues
+- Maintain a clean work directory for each of your issues using defined by you combination of `RepositoryBackend` (`GitLah`, `GitHub`, ...), `IssueBackend` (`Jira`, `GitHub`, `GitLab`, ...) and `GitUser`
 - When you start working on new issue it:
   - Clones all repositories you need to separate directory
   - Sets up branches in all repositories
@@ -88,6 +85,70 @@ gitUsers:
 
 ## Usage
 
+`issuectl` allows you to
+
+### Start
+
+```bash
+➜ issuectl start [issueNumber]
+```
+
+This will:
+
+- create a new work directory for your issue
+- clone all repositories defined in active profile to issue work dir
+- setup branches in those repositories
+- move issue to In Progress state
+- leave a comment under issue:
+
+![on it!](comment_start.png)
+
+---
+
+### Work
+
+```bash
+➜ issuectl workon [issueNumber]
+```
+
+This will open issue directory in your code editor (WARNING! ATM VSCODE IS HARDCODED)
+
+----
+
+### Open PR
+
+```bash
+➜ issuectl openpr [issueNumber]
+```
+
+This will:
+
+- create a Pull Request in `RepositoryBackend`
+- leave a comment under issue:
+
+![done!](comment_pr.png)
+
+---
+
+### Finish
+
+```bash
+➜ issuectl finish [issueNumber]
+```
+
+This will:
+
+- delete issue work dir
+- move issue to `Done` state
+- leave a comment under issue:
+
+![](comment_finish.png)
+---
+> This is a basic idea of workflow and what systems this can interact with at each step.
+![diagram](diagram.png)
+
+## Configuration
+
 ```bash
 ➜ issuectl --help
 
@@ -124,15 +185,15 @@ Flags:
 Use "issuectl [command] --help" for more information about a command.
 ```
 
-> This is a basic idea of workflow and what systems this can interact with at each step.
-![diagram](diagram.png)
-
 ### Repositories
 
 In order to work on code you need to define your repositories:
 
 ```bash
-➜ issuectl config repo add my-org repoName git@github.com:my-org/repoName.git
+➜ issuectl config repo add \
+    my-org \
+    repoName \
+    git@github.com:my-org/repoName.git
 ```
 
 ### Backends
@@ -160,19 +221,30 @@ Flags:
 Let's configure GitHub backend for our repository:
 
 ```bash
-➜ issuectl config backend add --github-token mysupersecrettoken my-org-github github
+➜ issuectl config backend add \
+    --github-token mysupersecrettoken \
+    my-org-github \
+    github
 ```
 
 And Jira backend for our issues:
 
 ```bash
-➜ issuectl config backend add --jira-host https://my-org.atlassian.net/ --jira-token "${JIRA_API_TOKEN}" --jira-username "${JIRA_USERNAME}" my-org-jira jira
+➜ issuectl config backend add \
+    --jira-host https://my-org.atlassian.net/ \
+    --jira-token "${JIRA_API_TOKEN}" \
+    --jira-username "${JIRA_USERNAME}" \
+    my-org-jira \
+    jira
 ```
 
 ### Git Users
 
 ```bash
-➜ issuectl config gituser add "John Doe" johndoe@myorg.com /Users/johndoe/.ssh/work
+➜ issuectl config gituser add \
+    "John Doe" \
+    johndoe@myorg.com \
+    /Users/johndoe/.ssh/work
 ```
 
 ### Profiles
@@ -191,7 +263,13 @@ Flags:
 ```
 
 ```bash
-➜ issuectl profile add -r repoName work /Users/johndoe/Workspace/myorg my-org-jira my-org-github "John Doe" repoName
+➜ issuectl profile add \
+    -r repoName \
+    work \
+    /Users/johndoe/Workspace/myorg my-org-jira \
+    my-org-github \
+    "John Doe" \
+    repoName
 ➜ issuectl use work
 ```
 
@@ -202,25 +280,3 @@ This will create a profile which will clone `repoName` for each issue. You might
 ```
 
 This will add `repoName2` to your profile and clone it when starting work on new issue.
-
-### Issues
-
-With all of this in place you can work on issues
-
-#### Start
-
-```bash
-➜ issuectl start [issueNumber]
-```
-
-#### Open PR
-
-```bash
-➜ issuectl openpr [issueNumber]
-```
-
-#### Finish
-
-```bash
-➜ issuectl finish [issueNumber]
-```
