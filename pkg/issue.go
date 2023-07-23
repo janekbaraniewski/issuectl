@@ -23,6 +23,7 @@ func StartWorkingOnIssue(config IssuectlConfig, issueID IssueID) error {
 	profile := config.GetProfile(config.GetCurrentProfile())
 	repositories := []string{}
 	for _, repoName := range profile.Repositories {
+		Log.Infof("Appending repo %v", repoName)
 		repositories = append(repositories, string(repoName))
 	}
 
