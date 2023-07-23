@@ -118,6 +118,10 @@ func StartWorkingOnIssue(config IssuectlConfig, issueID IssueID) error {
 		return err
 	}
 
+	if err := issueBackend.StartIssue("", "", issueID); err != nil {
+		return err
+	}
+
 	if err := config.AddIssue(newIssue); err != nil {
 		return err
 	}
