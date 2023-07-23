@@ -32,14 +32,14 @@ var DefaultSSHKeyPath = getDefaultSSHKeyPath()
 
 // IssuectlConfig manages configuration
 type issuectlConfig struct {
-	CurrentProfile ProfileName                          `json:"currentProfile"`
-	Repositories   map[RepoConfigName]*RepoConfig       `json:"repositories"`
-	Issues         map[IssueID]*IssueConfig             `json:"issues"`
-	Profiles       map[ProfileName]*Profile             `json:"profiles"`
-	Backends       map[BackendConfigName]*BackendConfig `json:"backends"`
-	GitUsers       map[GitUserName]*GitUser             `json:"gitUsers"`
+	CurrentProfile ProfileName                          `yaml:"currentProfile"`
+	Repositories   map[RepoConfigName]*RepoConfig       `yaml:"repositories"`
+	Issues         map[IssueID]*IssueConfig             `yaml:"issues"`
+	Profiles       map[ProfileName]*Profile             `yaml:"profiles"`
+	Backends       map[BackendConfigName]*BackendConfig `yaml:"backends"`
+	GitUsers       map[GitUserName]*GitUser             `yaml:"gitUsers"`
 
-	_persistenceMode string `json:"-"`
+	_persistenceMode string `yaml:"-"`
 }
 
 type IssuectlConfig interface {

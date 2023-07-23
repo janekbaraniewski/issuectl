@@ -12,7 +12,7 @@ type Profile struct {
 	Repositories []RepoConfigName  `yaml:"repositories"`
 
 	// DefaultRepository is now used for Github IssueBackend
-	DefaultRepository RepoConfigName `json:"defaultRepository"`
+	DefaultRepository RepoConfigName `yaml:"defaultRepository"`
 }
 
 func (p *Profile) AddRepository(repo RepoConfigName) error {
