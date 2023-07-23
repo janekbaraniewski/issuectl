@@ -1,6 +1,7 @@
 package issuectl
 
 import (
+	"encoding/base64"
 	"fmt"
 	"strconv"
 )
@@ -24,4 +25,74 @@ type IssueBackend interface {
 
 type RepositoryBackend interface {
 	OpenPullRequest(owner string, repo RepoConfigName, title, body, baseBranch, headBranch string) error
+}
+
+// getIssueBackendConfigurator prepares IssueBackend
+func getIssueBackendConfigurator(backendConfig *BackendConfig) (IssueBackend, error) {
+	switch backendConfig.Type {
+
+	case BackendGithub:
+		token, err := base64.RawStdEncoding.DecodeString(backendConfig.GitHub.Token)
+		if err != nil {
+			return nil, err
+		}
+		return NewGitHubClient(
+			string(token),
+			backendConfig.GitHub.Host,
+			backendConfig.GitHub.Username,
+		), nil
+
+	case BackendGitLab:
+		token, err := base64.RawStdEncoding.DecodeString(backendConfig.GitLab.Token)
+		if err != nil {
+			return nil, err
+		}
+		return NewGitLabClient(
+			string(token),
+			backendConfig.GitLab.Host,
+			backendConfig.GitLab.UserID,
+		), nil
+
+	case BackendJira:
+		token, err := base64.RawStdEncoding.DecodeString(backendConfig.Jira.Token)
+		if err != nil {
+			return nil, err
+		}
+		return NewJiraClient(
+			backendConfig.Jira.Username,
+			string(token),
+			backendConfig.Jira.Host,
+		), nil
+	default:
+		return nil, fmt.Errorf("Backend %v not supported", backendConfig.Type)
+	}
+}
+
+// getRepoBackendConfigurator prepares RepositoryBackend
+func getRepoBackendConfigurator(backendConfig *BackendConfig) (RepositoryBackend, error) {
+	switch backendConfig.Type {
+	case BackendGithub:
+		token, err := base64.RawStdEncoding.DecodeString(backendConfig.GitHub.Token)
+		if err != nil {
+			return nil, err
+		}
+		return NewGitHubClient(
+			string(token),
+			backendConfig.GitHub.Host,
+			backendConfig.GitHub.Username,
+		), nil
+
+	case BackendGitLab:
+		token, err := base64.RawStdEncoding.DecodeString(backendConfig.GitLab.Token)
+		if err != nil {
+			return nil, err
+		}
+		return NewGitLabClient(
+			string(token),
+			backendConfig.GitLab.Host,
+			backendConfig.GitLab.UserID,
+		), nil
+	default:
+		return nil, fmt.Errorf("Backend %v not supported", backendConfig.Type)
+	}
 }
