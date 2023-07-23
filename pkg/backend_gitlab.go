@@ -46,7 +46,7 @@ func (g *GitLab) CloseIssue(owner string, repo RepoConfigName, issueID IssueID) 
 	return nil
 }
 
-func (g *GitLab) OpenPullRequest(owner string, repo RepoConfigName, title, body, baseBranch, headBranch string) error {
+func (g *GitLab) OpenPullRequest(owner string, repo RepoConfigName, title, body, baseBranch, headBranch string) (*int, error) {
 	pullReqOpt := &gitlab.CreateMergeRequestOptions{
 		Title:        gitlab.String(title),
 		Description:  gitlab.String(body),
@@ -54,12 +54,12 @@ func (g *GitLab) OpenPullRequest(owner string, repo RepoConfigName, title, body,
 		TargetBranch: gitlab.String(baseBranch),
 	}
 
-	_, _, err := g.client.MergeRequests.CreateMergeRequest(fmt.Sprintf("%s/%s", owner, repo), pullReqOpt)
+	mr, _, err := g.client.MergeRequests.CreateMergeRequest(fmt.Sprintf("%s/%s", owner, repo), pullReqOpt)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return &mr.ID, nil
 }
 
 func (g *GitLab) LinkIssueToRepo(owner string, repo RepoConfigName, issueID IssueID, pullRequestID string) error {

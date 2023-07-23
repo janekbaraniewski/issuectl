@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/andygrunwald/go-jira"
@@ -175,7 +176,7 @@ func OpenPullRequest(issueID IssueID) error {
 	}
 
 	repo := config.GetRepository(profile.DefaultRepository)
-	return repoBackend.OpenPullRequest(
+	prId, err := repoBackend.OpenPullRequest(
 		repo.Owner,
 		repo.Name,
 		fmt.Sprintf("%v | %v", issue.ID, issue.Name),
@@ -183,6 +184,15 @@ func OpenPullRequest(issueID IssueID) error {
 		"master", // TODO: make configurable
 		issue.BranchName,
 	)
+	if err != nil {
+		return err
+	}
+
+	issueBackend, err := getIssueBackendConfigurator(config.GetBackend(profile.RepoBackend))
+	if err != nil {
+		return err
+	}
+	return issueBackend.LinkIssueToRepo(repo.Owner, repo.Name, issueID, strconv.Itoa(*prId))
 }
 
 // FinishWorkingOnIssue finishes work on an issue
