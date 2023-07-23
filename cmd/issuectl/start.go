@@ -64,7 +64,7 @@ func initStartCommand(rootCmd *cobra.Command) {
 			if err != nil {
 				return err
 			}
-			if err := issuectl.StartWorkingOnIssue(config, issuectl.IssueID(args[0])); err != nil {
+			if err := issuectl.StartWorkingOnIssue(config.GetPersistent(), issuectl.IssueID(args[0])); err != nil {
 				// TODO: rollback changes made by StartWorkingOnIssue
 				return err
 			}
