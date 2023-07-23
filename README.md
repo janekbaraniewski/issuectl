@@ -33,39 +33,43 @@ On macOS:
 ? Enter SSH key path: /Users/johndoe/.ssh/id_rsa
 ? Do you want to configure a backend? Yes
 ? Select backend type: github
-? Enter backend token: *******
-? Enter working directory for profile: /Users/johndoe/Workspace/workIssues
-? Enter repository name: myRepo
-? Enter repository owner: myOrg
-? Enter repository URL: git@github.com:myOrg/myRepo.git
+? Enter GitHub Host (Skip for https://api.github.com/):
+? Enter GitHub Token: ****************
+? Enter GitHub Username: johndoe
+? Enter working directory for profile: /Users/johndoe/Workdir
+? Enter repository name: my-repo
+? Enter repository owner: johndoe
+? Enter repository URL: git@github.com:johndoe/my-repo.git
 ```
 
 To see generated config run
 
 ```bash
 ➜ issuectl config get
-currentprofile: ""
+currentProfile: default
 repositories:
-  myRepo:
-    name: myRepo
-    owner: myOrg
-    repourl: git@github.com:myOrg/myRepo.git
-issues: {}
+  my-repo:
+    name: my-repo
+    owner: johndoe
+    url: git@github.com:johndoe/my-repo.git
 profiles:
   default:
     name: default
-    workdir: /Users/johndoe/Workspace/workIssues
-    backend: default
-    gitusername: John Doe
+    workDir: /Users/johndoe/Workdir
+    issueBackend: default
+    repoBackend: default
+    gituser: John Doe
     repositories:
-    - myRepo
-    defaultrepository: myRepo
+    - my-repo
+    defaultRepository: my-repo
 backends:
   default:
     name: default
-    type: github
-    token: bmljZXRyeQ
-gitusers:
+    backendType: github
+    github:
+      token: supersecrettoken
+      username: johndoe
+gitUsers:
   John Doe:
     name: John Doe
     email: john@doe.com
@@ -80,13 +84,13 @@ gitusers:
 issuectl helps managing separate environments for work on multiple issues.
 
 Start work on issue:
-        issuectl start [issueNumber]
+	issuectl start [issue_number]
 
 Open PR and link it to issue
-        issuectl openpr [issueNumber]
+	issuectl openpr [issue_number]
 
 Finish work, close the issue
-        issuectl finish [issueNumber]
+	issuectl finish [issue_number]
 
 Usage:
   issuectl [flags]
@@ -99,12 +103,13 @@ Available Commands:
   help        Help about any command
   init        Initialize configuration
   list        List all issues
-  open        Open specified issue in the preferred code editor
   openpr      Opens a pull request for the specified issue
   start       Start work on issue
+  workon      Open specified issue in the preferred code editor
 
 Flags:
-  -h, --help   help for issuectl
+  -h, --help      help for issuectl
+  -v, --version   version for issuectl
 
 Use "issuectl [command] --help" for more information about a command.
 ```
