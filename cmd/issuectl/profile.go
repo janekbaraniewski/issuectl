@@ -39,7 +39,7 @@ func initProfileListCommand(rootCmd *cobra.Command) {
 				for _, repoName := range profile.Repositories {
 					repos = append(repos, string(repoName))
 				}
-				fmt.Fprintln(w, fmt.Sprintf(
+				fmt.Fprintln(w, fmt.Sprintf( //nolint
 					"%v\t%v\t%v\t%v\t%v\t%v\t",
 					profile.Name, profile.WorkDir, profile.GitUserName, profile.IssueBackend, profile.RepoBackend, repos,
 				))
@@ -130,7 +130,9 @@ func initProfileAddRepoCommand(rootCmd *cobra.Command) {
 			config := issuectl.LoadConfig().GetPersistent()
 			repoName := args[0]
 			profile := config.GetProfile(config.GetCurrentProfile())
-			profile.AddRepository((issuectl.RepoConfigName)(repoName))
+			if err := profile.AddRepository((issuectl.RepoConfigName)(repoName)); err != nil {
+				return err
+			}
 			if err := config.UpdateProfile(profile); err != nil {
 				return err
 			}

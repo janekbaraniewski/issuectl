@@ -8,3 +8,6 @@ linters-settings:
       - HACK # marks hack-around that should be removed before merging
   lll:
     line-length: 130
+run:
+  skip-files:
+    - ".*_test.go"

@@ -43,7 +43,9 @@ func MergeConfigWithOverwrites(conf issuectl.IssuectlConfig, overwrites *CLIOver
 		overwriteProfile.Repositories = repos
 	}
 
-	conf.UpdateProfile(overwriteProfile)
+	if err := conf.UpdateProfile(overwriteProfile); err != nil {
+		return nil, err
+	}
 	return conf, nil
 }
 
