@@ -11,11 +11,11 @@ import (
 )
 
 const (
-	GitHubApi                    = "https://api.github.com/"
-	errIssueIDNotFound           = "issueID not found"
-	errIssueDoesNotExistOnGitHub = "while looking for issue on GitHub: %w"
-	errFailedToCloseIssue        = "failed to close the issue: %w"
-	errFailedToGetIssue          = "failed to get the issue: %w"
+	GitHubApi                     = "https://api.github.com/"
+	errIssueIDNotFound            = "issueID not found"
+	errIssueDoesNotExistOnBackend = "while looking for issue on %v: %v"
+	errFailedToCloseIssue         = "failed to close the issue: %w"
+	errFailedToGetIssue           = "failed to get the issue: %w"
 )
 
 // getIssueBackendConfigurator prepares IssueBackend
@@ -136,9 +136,12 @@ func initializeIssueBackendAndDir(config IssuectlConfig, profile *Profile, issue
 	}
 
 	repo := config.GetRepository(profile.DefaultRepository)
-	exists, err := issueBackend.IssueExists(repo.Owner, repo.Name, issueID)
-	if err != nil || !exists {
-		return nil, "", fmt.Errorf(errIssueDoesNotExistOnGitHub, err)
+	issueFromBackend, err := issueBackend.GetIssue(repo.Owner, repo.Name, issueID)
+	if err != nil {
+		return nil, "", fmt.Errorf(errIssueDoesNotExistOnBackend, backendConfig.Name, err)
+	}
+	if issueFromBackend == nil {
+		return nil, "", fmt.Errorf("Issue %v not found in backend %v", issueID, backendConfig.Name)
 	}
 
 	issueDirPath, err := createDirectory(profile.WorkDir, string(issueID))

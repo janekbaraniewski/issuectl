@@ -19,9 +19,6 @@ type IssueBackend interface {
 	LinkIssueToRepo(owner string, repo RepoConfigName, issueID IssueID, pullRequestID string) error
 	CloseIssue(owner string, repo RepoConfigName, issueID IssueID) error
 	GetIssue(owner string, repo RepoConfigName, issueID IssueID) (interface{}, error)
-
-	// Deprecated
-	IssueExists(owner string, repo RepoConfigName, issueID IssueID) (bool, error)
 }
 
 type RepositoryBackend interface {

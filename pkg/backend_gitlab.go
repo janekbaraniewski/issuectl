@@ -26,20 +26,6 @@ func (g *GitLab) GetIssue(owner string, repo RepoConfigName, issueID IssueID) (i
 	return nil, nil
 }
 
-func (g *GitLab) IssueExists(owner string, repo RepoConfigName, issueID IssueID) (bool, error) {
-	issueNumber, err := getIssueNumberFromString(issueID)
-	if err != nil {
-		return false, err
-	}
-
-	_, _, err = g.client.Issues.GetIssue(fmt.Sprintf("%s/%s", owner, repo), issueNumber, nil)
-	if err != nil {
-		return false, err
-	}
-
-	return true, nil
-}
-
 func (g *GitLab) CloseIssue(owner string, repo RepoConfigName, issueID IssueID) error {
 	issueNumber, err := getIssueNumberFromString(issueID)
 	if err != nil {
