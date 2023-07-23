@@ -14,10 +14,11 @@ import (
 type GitHub struct {
 	baseURL string
 	token   string
+	user    string
 	client  *github.Client
 }
 
-func NewGitHubClient(token, baseURL string) *GitHub {
+func NewGitHubClient(token, baseURL, user string) *GitHub {
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
@@ -99,6 +100,48 @@ func (g *GitHub) LinkIssueToRepo(owner string, repo RepoConfigName, issueID Issu
 
 	if resp.StatusCode != http.StatusCreated {
 		return fmt.Errorf("failed to link issue to pull request: status code %d", resp.StatusCode)
+	}
+
+	return nil
+}
+
+func (g *GitHub) StartIssue(owner string, repo RepoConfigName, issueID IssueID) error {
+	issueNumber, err := getIssueNumberFromString(issueID)
+	if err != nil {
+		return err
+	}
+
+	issue, _, err := g.client.Issues.Get(context.Background(), owner, string(repo), issueNumber)
+	if err != nil {
+		return err
+	}
+
+	// Check if the issue is already labeled "In Progress"
+	for _, label := range issue.Labels {
+		if *label.Name == "In Progress" {
+			return nil
+		}
+	}
+
+	// If not, add the "In Progress" label
+	labels := []string{"In Progress"}
+	_, _, err = g.client.Issues.AddLabelsToIssue(context.Background(), owner, string(repo), issueNumber, labels)
+	if err != nil {
+		return err
+	}
+
+	// Check if the issue is already assigned to the specified user
+	for _, user := range issue.Assignees {
+		if *user.Login == g.user {
+			return nil
+		}
+	}
+
+	// If not, assign the issue to the specified user
+	assignees := []string{g.user}
+	_, _, err = g.client.Issues.AddAssignees(context.Background(), owner, string(repo), issueNumber, assignees)
+	if err != nil {
+		return err
 	}
 
 	return nil

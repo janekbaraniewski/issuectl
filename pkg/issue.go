@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/andygrunwald/go-jira"
 	"github.com/google/go-github/github"
 )
 
@@ -30,6 +31,7 @@ func getIssueBackendConfigurator(backendConfig *BackendConfig) (IssueBackend, er
 		return NewGitHubClient(
 			string(token),
 			backendConfig.GitHub.Host,
+			backendConfig.GitHub.Username,
 		), nil
 
 	case BackendGitLab:
@@ -40,6 +42,7 @@ func getIssueBackendConfigurator(backendConfig *BackendConfig) (IssueBackend, er
 		return NewGitLabClient(
 			string(token),
 			backendConfig.GitLab.Host,
+			backendConfig.GitLab.UserID,
 		), nil
 
 	case BackendJira:
@@ -47,7 +50,7 @@ func getIssueBackendConfigurator(backendConfig *BackendConfig) (IssueBackend, er
 		if err != nil {
 			return nil, err
 		}
-		return NewJiraBackend(
+		return NewJiraClient(
 			backendConfig.Jira.Username,
 			string(token),
 			backendConfig.Jira.Host,
@@ -68,6 +71,7 @@ func getRepoBackendConfigurator(backendConfig *BackendConfig) (RepositoryBackend
 		return NewGitHubClient(
 			string(token),
 			backendConfig.GitHub.Host,
+			backendConfig.GitHub.Username,
 		), nil
 
 	case BackendGitLab:
@@ -78,6 +82,7 @@ func getRepoBackendConfigurator(backendConfig *BackendConfig) (RepositoryBackend
 		return NewGitLabClient(
 			string(token),
 			backendConfig.GitLab.Host,
+			backendConfig.GitLab.UserID,
 		), nil
 	default:
 		return nil, fmt.Errorf("Backend %v not supported", backendConfig.Type)
@@ -103,12 +108,12 @@ func StartWorkingOnIssue(config IssuectlConfig, issueID IssueID) error {
 		return err
 	}
 
-	issue, branchName, err := getIssueAndBranchName(config, issueBackend, profile, issueID)
+	branchName, err := getBranchName(config, issueBackend, profile, issueID)
 	if err != nil {
 		return err
 	}
 
-	newIssue, err := createAndAddRepositoriesToIssue(config, profile, issueID, issueDirPath, branchName, issue, repositories)
+	newIssue, err := createAndAddRepositoriesToIssue(config, profile, issueID, issueDirPath, branchName, branchName, repositories)
 	if err != nil {
 		return err
 	}
@@ -153,21 +158,30 @@ func initializeIssueBackendAndDir(config IssuectlConfig, profile *Profile, issue
 }
 
 // getIssueAndBranchName gets issue and prepares branch name
-func getIssueAndBranchName(config IssuectlConfig, issueBackend IssueBackend, profile *Profile, issueID IssueID) (interface{}, string, error) {
+func getBranchName(config IssuectlConfig, issueBackend IssueBackend, profile *Profile, issueID IssueID) (string, error) {
 	repo := config.GetRepository(profile.DefaultRepository)
 	issue, err := issueBackend.GetIssue(repo.Owner, repo.Name, issueID)
 	if err != nil {
-		return nil, "", fmt.Errorf(errFailedToGetIssue, err)
+		return "", fmt.Errorf(errFailedToGetIssue, err)
 	}
 
-	branchName := fmt.Sprintf("%v-%v", issueID, strings.ReplaceAll(*issue.(*github.Issue).Title, " ", "-"))
-	return issue, branchName, nil
+	switch issue.(type) {
+	default:
+		return "", fmt.Errorf("Missing issue type")
+	case *github.Issue:
+		branchName := fmt.Sprintf("%v-%v", issueID, strings.ReplaceAll(*issue.(*github.Issue).Title, " ", "-"))
+		return branchName, nil
+	case *jira.Issue:
+		branchName := fmt.Sprintf("%v-%v", issueID, strings.ReplaceAll(*&issue.(*jira.Issue).Fields.Summary, " ", "-"))
+		return branchName, nil
+	}
 }
 
 // createAndAddRepositoriesToIssue prepares issue and clones repositories to it
-func createAndAddRepositoriesToIssue(config IssuectlConfig, profile *Profile, issueID IssueID, issueDirPath string, branchName string, issue interface{}, repositories []string) (*IssueConfig, error) {
+func createAndAddRepositoriesToIssue(
+	config IssuectlConfig, profile *Profile, issueID IssueID, issueDirPath string, branchName, issueTitle string, repositories []string) (*IssueConfig, error) {
 	newIssue := &IssueConfig{
-		Name:        *issue.(*github.Issue).Title,
+		Name:        issueTitle,
 		ID:          issueID,
 		BranchName:  branchName,
 		BackendName: "github",
