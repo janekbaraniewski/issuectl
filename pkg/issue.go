@@ -18,39 +18,70 @@ const (
 	errFailedToGetIssue          = "failed to get the issue: %w"
 )
 
-// decodeBackendToken decodes backend token from base64
-func decodeBackendToken(backendConfig *BackendConfig) (string, error) {
-	ghToken, err := base64.RawStdEncoding.DecodeString(backendConfig.Token)
-	if err != nil {
-		return "", err
-	}
-	return string(ghToken), nil
-}
-
 // getIssueBackendConfigurator prepares IssueBackend
 func getIssueBackendConfigurator(backendConfig *BackendConfig) (IssueBackend, error) {
-	ghToken, err := decodeBackendToken(backendConfig)
-	if err != nil {
-		return nil, err
+	switch backendConfig.Type {
+
+	case BackendGithub:
+		token, err := base64.RawStdEncoding.DecodeString(backendConfig.GitHub.Token)
+		if err != nil {
+			return nil, err
+		}
+		return NewGitHubClient(
+			string(token),
+			backendConfig.GitHub.Host,
+		), nil
+
+	case BackendGitLab:
+		token, err := base64.RawStdEncoding.DecodeString(backendConfig.GitLab.Token)
+		if err != nil {
+			return nil, err
+		}
+		return NewGitLabClient(
+			string(token),
+			backendConfig.GitLab.Host,
+		), nil
+
+	case BackendJira:
+		token, err := base64.RawStdEncoding.DecodeString(backendConfig.Jira.Token)
+		if err != nil {
+			return nil, err
+		}
+		return NewJiraBackend(
+			backendConfig.Jira.Username,
+			string(token),
+			backendConfig.Jira.Host,
+		), nil
+	default:
+		return nil, fmt.Errorf("Backend %v not supported", backendConfig.Type)
 	}
-	return GetIssueBackend(&GetBackendConfig{
-		Type:        backendConfig.Type,
-		GitHubApi:   GitHubApi,
-		GitHubToken: ghToken,
-	}), nil
 }
 
 // getRepoBackendConfigurator prepares RepositoryBackend
 func getRepoBackendConfigurator(backendConfig *BackendConfig) (RepositoryBackend, error) {
-	ghToken, err := decodeBackendToken(backendConfig)
-	if err != nil {
-		return nil, err
+	switch backendConfig.Type {
+	case BackendGithub:
+		token, err := base64.RawStdEncoding.DecodeString(backendConfig.GitHub.Token)
+		if err != nil {
+			return nil, err
+		}
+		return NewGitHubClient(
+			string(token),
+			backendConfig.GitHub.Host,
+		), nil
+
+	case BackendGitLab:
+		token, err := base64.RawStdEncoding.DecodeString(backendConfig.GitLab.Token)
+		if err != nil {
+			return nil, err
+		}
+		return NewGitLabClient(
+			string(token),
+			backendConfig.GitLab.Host,
+		), nil
+	default:
+		return nil, fmt.Errorf("Backend %v not supported", backendConfig.Type)
 	}
-	return GetRepoBackend(&GetBackendConfig{
-		Type:        backendConfig.Type,
-		GitHubApi:   GitHubApi,
-		GitHubToken: ghToken,
-	}), nil
 }
 
 // StartWorkingOnIssue starts work on an issue

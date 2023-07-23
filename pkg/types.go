@@ -13,16 +13,33 @@ const (
 // BackendConfigName is a name of instance of BackendConfig
 type BackendConfigName string
 
+type GitHubConfig struct {
+	Host  string `yaml:"host,omitempty"`
+	Token string `yaml:"token,omitempty"`
+}
+
+type GitLabConfig struct {
+	Host  string `yaml:"host,omitempty"`
+	Token string `yaml:"token,omitempty"`
+}
+
+type JiraConfig struct {
+	Host     string `yaml:"host,omitempty"`
+	Token    string `yaml:"token,omitempty"`
+	Username string `yaml:"username,omitempty"`
+}
+
 // BackendConfig stores configuration for given BackendType
 type BackendConfig struct {
 	// Name of BackendConfig instance
-	Name BackendConfigName `json:"name"`
+	Name BackendConfigName `yaml:"name"`
 
 	// BackendType of this BackendConfig
-	Type BackendType `json:"backendType"`
+	Type BackendType `yaml:"backendType"`
 
-	// Token stores base64 encoded token
-	Token string `json:"token"`
+	GitHub *GitHubConfig `yaml:"github,omitempty"`
+	GitLab *GitLabConfig `yaml:"gitlab,omitempty"`
+	Jira   *JiraConfig   `yaml:"jira,omitempty"`
 }
 
 type GitUserName string
@@ -43,13 +60,13 @@ type RepoConfigName string
 // RepoConfig stores configuration for given git repo
 type RepoConfig struct {
 	// Name of this repo
-	Name RepoConfigName `json:"name"`
+	Name RepoConfigName `yaml:"name"`
 
 	// Repo owner
-	Owner string `json:"owner"`
+	Owner string `yaml:"owner"`
 
 	// URL to this repo
-	RepoURL RepoURL `json:"url"`
+	RepoURL RepoURL `yaml:"url"`
 }
 
 // IssueID is a unique ID of issue in IssueBackend
@@ -57,11 +74,11 @@ type IssueID string
 
 // IssueConfig stores configuration for single issue
 type IssueConfig struct {
-	Name         string            `json:"name"`
-	ID           IssueID           `json:"id"`
-	BackendName  BackendConfigName `json:"backendName"`
-	BranchName   string            `json:"branchName"`
-	Repositories []RepoConfigName  `json:"repositories"`
-	Dir          string            `json:"dir"`
-	Profile      ProfileName       `json:"profile"`
+	Name         string            `yaml:"name"`
+	ID           IssueID           `yaml:"id"`
+	BackendName  BackendConfigName `yaml:"backendName"`
+	BranchName   string            `yaml:"branchName"`
+	Repositories []RepoConfigName  `yaml:"repositories"`
+	Dir          string            `yaml:"dir"`
+	Profile      ProfileName       `yaml:"profile"`
 }
