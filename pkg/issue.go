@@ -129,7 +129,7 @@ func isIssueIdInUse(config IssuectlConfig, issueID IssueID) bool {
 
 // initializeIssueBackendAndDir prepares IssueBackend and creates directory for issue
 func initializeIssueBackendAndDir(config IssuectlConfig, profile *Profile, issueID IssueID) (IssueBackend, string, error) {
-	backendConfig := config.GetBackend(profile.Backend)
+	backendConfig := config.GetBackend(profile.IssueBackend)
 	issueBackend, err := getIssueBackendConfigurator(backendConfig)
 	if err != nil {
 		return nil, "", err
@@ -216,7 +216,7 @@ func OpenPullRequest(issueID IssueID) error {
 		return fmt.Errorf(errIssueIDNotFound)
 	}
 
-	repoBackend, err := getRepoBackendConfigurator(config.GetBackend(profile.Backend))
+	repoBackend, err := getRepoBackendConfigurator(config.GetBackend(profile.RepoBackend))
 	if err != nil {
 		return err
 	}
@@ -238,7 +238,7 @@ func FinishWorkingOnIssue(issueID IssueID) error {
 	profile := config.GetProfile(config.GetCurrentProfile())
 	repo := config.GetRepository(profile.DefaultRepository)
 
-	issueBackend, err := getIssueBackendConfigurator(config.GetBackend(profile.Backend))
+	issueBackend, err := getIssueBackendConfigurator(config.GetBackend(profile.IssueBackend))
 	if err != nil {
 		return err
 	}

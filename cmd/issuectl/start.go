@@ -9,9 +9,10 @@ import (
 )
 
 type CLIOverwrites struct {
-	Repos   []string
-	Profile string
-	Backend string
+	Repos        []string
+	Profile      string
+	IssueBackend string
+	RepoBackend  string
 }
 
 var Flags CLIOverwrites
@@ -29,8 +30,8 @@ func MergeConfigWithOverwrites(conf issuectl.IssuectlConfig, overwrites *CLIOver
 	if overwriteProfile == nil {
 		return conf, fmt.Errorf("Failed - profile %v not defined.", overwrites.Profile)
 	}
-	if overwrites.Backend != "" {
-		overwriteProfile.Backend = issuectl.BackendConfigName(overwrites.Profile)
+	if overwrites.IssueBackend != "" {
+		overwriteProfile.IssueBackend = issuectl.BackendConfigName(overwrites.IssueBackend)
 	}
 	if overwrites.Repos != nil {
 		repos := []issuectl.RepoConfigName{}
@@ -89,11 +90,19 @@ func initStartCommand(rootCmd *cobra.Command) {
 	)
 
 	startCmd.PersistentFlags().StringVarP(
-		&Flags.Backend,
-		"backend",
-		"b",
+		&Flags.IssueBackend,
+		"issue-backend",
+		"",
 		"",
 		"Name of issue backend to use for command",
+	)
+
+	startCmd.PersistentFlags().StringVarP(
+		&Flags.RepoBackend,
+		"repo-backend",
+		"",
+		"",
+		"Name of repo backend to use for command",
 	)
 
 	rootCmd.AddCommand(startCmd)
