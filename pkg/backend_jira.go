@@ -51,16 +51,12 @@ func (j *Jira) CloseIssue(owner string, repo RepoConfigName, issueID IssueID) er
 }
 
 func (j *Jira) LinkIssueToRepo(owner string, repo RepoConfigName, issueID IssueID, pullRequestID string) error {
-	link := jira.IssueLink{
-		Type: jira.IssueLinkType{
-			Name:    "Cloners",
-			Inward:  "clones",
-			Outward: "is cloned by",
-		},
-		InwardIssue:  &jira.Issue{Key: string(issueID)},
-		OutwardIssue: &jira.Issue{Key: pullRequestID},
+	pullRequestURL := fmt.Sprintf("https://github.com/%s/%s/pull/%s", owner, repo, pullRequestID)
+
+	comment := jira.Comment{
+		Body: fmt.Sprintf("A new pull request has been linked: %s", pullRequestURL),
 	}
-	_, err := j.client.Issue.AddLink(&link)
+	_, _, err := j.client.Issue.AddComment(string(issueID), &comment)
 	if err != nil {
 		return err
 	}
