@@ -53,16 +53,17 @@ func initProfileListCommand(rootCmd *cobra.Command) {
 
 func initProfileAddCommand(rootCmd *cobra.Command) {
 	addCmd := &cobra.Command{
-		Use:   "add [name] [workdir] [backend] [git user]",
+		Use:   "add [name] [workdir] [issue backend] [repo backend] [git user]",
 		Short: "Add a new profile",
-		Args:  cobra.ExactArgs(5),
+		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			config := issuectl.LoadConfig().GetPersistent()
 			profileName := args[0]
 			workDir := args[1]
-			backend := args[2]
-			gitUser := args[3]
-			defaultRepo := args[4]
+			issueBackend := args[2]
+			repoBackend := args[3]
+			gitUser := args[4]
+			defaultRepo := args[5]
 			repos := []issuectl.RepoConfigName{}
 			for _, repoName := range Flags.Repos {
 				repos = append(repos, (issuectl.RepoConfigName)(repoName))
@@ -71,8 +72,8 @@ func initProfileAddCommand(rootCmd *cobra.Command) {
 				Name:              issuectl.ProfileName(profileName),
 				WorkDir:           workDir,
 				Repositories:      repos,
-				IssueBackend:      issuectl.BackendConfigName(backend),
-				RepoBackend:       "github-priv",
+				IssueBackend:      issuectl.BackendConfigName(issueBackend),
+				RepoBackend:       issuectl.BackendConfigName(repoBackend),
 				GitUserName:       issuectl.GitUserName(gitUser),
 				DefaultRepository: issuectl.RepoConfigName(defaultRepo),
 			}
