@@ -1,7 +1,6 @@
 package issuectl
 
 import (
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"os"
@@ -19,76 +18,6 @@ const (
 	errFailedToGetIssue           = "failed to get the issue: %w"
 )
 
-// getIssueBackendConfigurator prepares IssueBackend
-func getIssueBackendConfigurator(backendConfig *BackendConfig) (IssueBackend, error) {
-	switch backendConfig.Type {
-
-	case BackendGithub:
-		token, err := base64.RawStdEncoding.DecodeString(backendConfig.GitHub.Token)
-		if err != nil {
-			return nil, err
-		}
-		return NewGitHubClient(
-			string(token),
-			backendConfig.GitHub.Host,
-			backendConfig.GitHub.Username,
-		), nil
-
-	case BackendGitLab:
-		token, err := base64.RawStdEncoding.DecodeString(backendConfig.GitLab.Token)
-		if err != nil {
-			return nil, err
-		}
-		return NewGitLabClient(
-			string(token),
-			backendConfig.GitLab.Host,
-			backendConfig.GitLab.UserID,
-		), nil
-
-	case BackendJira:
-		token, err := base64.RawStdEncoding.DecodeString(backendConfig.Jira.Token)
-		if err != nil {
-			return nil, err
-		}
-		return NewJiraClient(
-			backendConfig.Jira.Username,
-			string(token),
-			backendConfig.Jira.Host,
-		), nil
-	default:
-		return nil, fmt.Errorf("Backend %v not supported", backendConfig.Type)
-	}
-}
-
-// getRepoBackendConfigurator prepares RepositoryBackend
-func getRepoBackendConfigurator(backendConfig *BackendConfig) (RepositoryBackend, error) {
-	switch backendConfig.Type {
-	case BackendGithub:
-		token, err := base64.RawStdEncoding.DecodeString(backendConfig.GitHub.Token)
-		if err != nil {
-			return nil, err
-		}
-		return NewGitHubClient(
-			string(token),
-			backendConfig.GitHub.Host,
-			backendConfig.GitHub.Username,
-		), nil
-
-	case BackendGitLab:
-		token, err := base64.RawStdEncoding.DecodeString(backendConfig.GitLab.Token)
-		if err != nil {
-			return nil, err
-		}
-		return NewGitLabClient(
-			string(token),
-			backendConfig.GitLab.Host,
-			backendConfig.GitLab.UserID,
-		), nil
-	default:
-		return nil, fmt.Errorf("Backend %v not supported", backendConfig.Type)
-	}
-}
-
 // StartWorkingOnIssue starts work on an issue
 func StartWorkingOnIssue(config IssuectlConfig, issueID IssueID) error {
 	profile := config.GetProfile(config.GetCurrentProfile())
@@ -98,7 +27,7 @@ func StartWorkingOnIssue(config IssuectlConfig, issueID IssueID) error {
 	}
 
 	if isIssueIdInUse(config, issueID) {
-		return fmt.Errorf("issueID already in use")
+		return fmt.Errorf("issueID already found in local configuration")
 	}
 
 	Log.Infof("Starting work on issue %v ...", issueID)
