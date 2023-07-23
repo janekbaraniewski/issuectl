@@ -53,7 +53,7 @@ func initProfileListCommand(rootCmd *cobra.Command) {
 
 func initProfileAddCommand(rootCmd *cobra.Command) {
 	addCmd := &cobra.Command{
-		Use:   "add [name] [workdir] [issue backend] [repo backend] [git user]",
+		Use:   "add [name] [workdir] [issue backend] [repo backend] [git user] [default repo]",
 		Short: "Add a new profile",
 		Args:  cobra.ExactArgs(6),
 		RunE: func(cmd *cobra.Command, args []string) error {

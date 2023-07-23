@@ -132,7 +132,7 @@ Use "issuectl [command] --help" for more information about a command.
 In order to work on code you need to define your repositories:
 
 ```bash
-➜ issuectl config repo add user repoName git@github.com:user/repoName.git
+➜ issuectl config repo add my-org repoName git@github.com:my-org/repoName.git
 ```
 
 ### Backends
@@ -157,10 +157,22 @@ Flags:
       --jira-username string   Jira API Username
 ```
 
-Let's configure GitGub backend as example:
+Let's configure GitHub backend for our repository:
 
 ```bash
-➜ issuectl config backend add --github-token mysupersecrettoken example-github github
+➜ issuectl config backend add --github-token mysupersecrettoken my-org-github github
+```
+
+And Jira backend for our issues:
+
+```bash
+➜ issuectl config backend add --jira-host https://my-org.atlassian.net/jira/ --jira-token "${JIRA_API_TOKEN}" --jira-username "${JIRA_USERNAME}" my-org-jira jira
+```
+
+### Git Users
+
+```bash
+➜ issuectl config gituser add "John Doe" johndoe@myorg.com /Users/johndoe/.ssh/work
 ```
 
 ### Profiles
@@ -168,17 +180,28 @@ Let's configure GitGub backend as example:
 Once you've set all of this up, you can create your default profile:
 
 ```bash
-➜ issuectl profile add default /Path/To/Workspace repoName
-➜ issuectl use default
+➜ issuectl config profile add
+Usage:
+  issuectl config profile add [name] [workdir] [issue backend] [repo backend] [git user] [default repo] [flags]
+
+Flags:
+  -h, --help            help for add
+  -r, --repos strings   A list of repositories to clone
+
+```
+
+```bash
+➜ issuectl profile add -r repoName work /Users/johndoe/Workspace/myorg my-org-jira my-org-github "John Doe" repoName
+➜ issuectl use work
 ```
 
 This will create a profile which will clone `repoName` for each issue. You might want to clone multiple repositories, depending on your environment. For this, run
 
 ```bash
-➜ issuectl profile addRepo repoName
+➜ issuectl config profile addRepo repoName2
 ```
 
-This will add `repoName` to your profile and clone it when starting work on new issue.
+This will add `repoName2` to your profile and clone it when starting work on new issue.
 
 ### Issues
 
