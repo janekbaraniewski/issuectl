@@ -7,18 +7,20 @@ import (
 )
 
 type GitLab struct {
-	client *gitlab.Client
+	client  *gitlab.Client
+	userID  int
+	token   string
+	baseURL string
 }
 
-func NewGitLabClient(token, baseURL string) *GitLab {
-	Log.Infof("NOT TESTED")
+func NewGitLabClient(token, baseURL string, userID int) *GitLab {
 	client, err := gitlab.NewClient(token, gitlab.WithBaseURL(baseURL))
 	if err != nil {
 		Log.Infof("failed to create GitLab client: %v", err)
 		return nil
 	}
 
-	return &GitLab{client: client}
+	return &GitLab{client: client, userID: userID, token: token, baseURL: baseURL}
 }
 
 func (g *GitLab) GetIssue(owner string, repo RepoConfigName, issueID IssueID) (interface{}, error) {
@@ -78,6 +80,35 @@ func (g *GitLab) LinkIssueToRepo(owner string, repo RepoConfigName, issueID Issu
 	}
 
 	_, _, err = g.client.MergeRequests.UpdateMergeRequest(fmt.Sprintf("%s/%s", owner, repo), pullRequestNumber, pullReqOpt)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (g *GitLab) StartIssue(owner string, repo RepoConfigName, issueID IssueID) error {
+	issueNumber, err := getIssueNumberFromString(issueID)
+	if err != nil {
+		return err
+	}
+
+	issue, _, err := g.client.Issues.GetIssue(fmt.Sprintf("%s/%s", owner, repo), issueNumber, nil)
+	if err != nil {
+		return err
+	}
+
+	// Check if the issue is already assigned
+	if issue.Assignee != nil && issue.Assignee.ID == g.userID {
+		return nil
+	}
+
+	// If not, assign the issue to the specified user
+	issueOpt := &gitlab.UpdateIssueOptions{
+		AssigneeIDs: &[]int{g.userID},
+	}
+
+	_, _, err = g.client.Issues.UpdateIssue(fmt.Sprintf("%s/%s", owner, repo), issueNumber, issueOpt)
 	if err != nil {
 		return err
 	}

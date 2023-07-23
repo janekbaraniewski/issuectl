@@ -18,6 +18,7 @@ func getIssueNumberFromString(issueID IssueID) (int, error) {
 type IssueBackend interface {
 	LinkIssueToRepo(owner string, repo RepoConfigName, issueID IssueID, pullRequestID string) error
 	CloseIssue(owner string, repo RepoConfigName, issueID IssueID) error
+	StartIssue(owner string, repo RepoConfigName, issueID IssueID) error
 	GetIssue(owner string, repo RepoConfigName, issueID IssueID) (interface{}, error)
 }
 

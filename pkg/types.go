@@ -14,13 +14,15 @@ const (
 type BackendConfigName string
 
 type GitHubConfig struct {
-	Host  string `yaml:"host,omitempty"`
-	Token string `yaml:"token,omitempty"`
+	Host     string `yaml:"host,omitempty"`
+	Token    string `yaml:"token,omitempty"`
+	Username string `yaml:"username,omitempty"`
 }
 
 type GitLabConfig struct {
-	Host  string `yaml:"host,omitempty"`
-	Token string `yaml:"token,omitempty"`
+	Host   string `yaml:"host,omitempty"`
+	Token  string `yaml:"token,omitempty"`
+	UserID int    `yaml:"userID,omitempty"`
 }
 
 type JiraConfig struct {
