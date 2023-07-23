@@ -24,7 +24,7 @@ type IssueBackend interface {
 }
 
 type RepositoryBackend interface {
-	OpenPullRequest(owner string, repo RepoConfigName, title, body, baseBranch, headBranch string) error
+	OpenPullRequest(owner string, repo RepoConfigName, title, body, baseBranch, headBranch string) (*int, error)
 }
 
 // getIssueBackendConfigurator prepares IssueBackend
