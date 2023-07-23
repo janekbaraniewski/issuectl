@@ -19,7 +19,7 @@ brews:
   - name: issuectl
     ids:
       - issuectl
-    tap:
+    repository:
       owner: janekbaraniewski
       name: homebrew-janekbaraniewski
     folder: Formula
