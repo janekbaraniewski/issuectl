@@ -1,6 +1,7 @@
 package issuectl
 
 import (
+	"bytes"
 	"fmt"
 
 	jira "github.com/andygrunwald/go-jira"
@@ -63,13 +64,16 @@ func (j *Jira) CloseIssue(owner string, repo RepoConfigName, issueID IssueID) er
 }
 
 func (j *Jira) GetIssue(owner string, repo RepoConfigName, issueID IssueID) (interface{}, error) {
-	issue, _, err := j.client.Issue.Get(string(issueID), nil)
+	issue, resp, err := j.client.Issue.Get(string(issueID), nil)
 	if err != nil {
 		return nil, err
 	}
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(resp.Body)
+	respBytes := buf.String()
+	respString := string(respBytes)
+
+	Log.Infof("ISSUE -> %v", issue)
+	Log.Infof("RESP -> %v", respString)
 	return issue, nil
-}
-func (j *Jira) IssueExists(owner string, repo RepoConfigName, issueID IssueID) (bool, error) {
-	issue, err := j.GetIssue(owner, repo, issueID)
-	return issue == nil, err
 }
