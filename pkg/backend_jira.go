@@ -14,9 +14,11 @@ type Jira struct {
 }
 
 const (
-	ToDo       = "To Do"
-	InProgress = "In Progress"
-	Done       = "Done"
+	ToDo                = "To Do"
+	InProgress          = "In Progress"
+	Done                = "Done"
+	DefaultStartMessage = "On it 👀"
+	DefaultCloseMessage = "✅"
 )
 
 func NewJiraClient(email, apiToken, baseURL string) *Jira {
@@ -43,11 +45,11 @@ func (j *Jira) GetIssue(owner string, repo RepoConfigName, issueID IssueID) (int
 }
 
 func (j *Jira) StartIssue(owner string, repo RepoConfigName, issueID IssueID) error {
-	return j.moveIssueToState(issueID, InProgress, "On it 👀")
+	return j.moveIssueToState(issueID, InProgress, DefaultStartMessage)
 }
 
 func (j *Jira) CloseIssue(owner string, repo RepoConfigName, issueID IssueID) error {
-	return j.moveIssueToState(issueID, Done, "✅")
+	return j.moveIssueToState(issueID, Done, DefaultCloseMessage)
 }
 
 func (j *Jira) LinkIssueToRepo(owner string, repo RepoConfigName, issueID IssueID, pullRequestID string) error {
