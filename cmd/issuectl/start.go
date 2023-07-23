@@ -34,13 +34,9 @@ func MergeConfigWithOverwrites(conf issuectl.IssuectlConfig, overwrites *CLIOver
 		overwriteProfile.IssueBackend = issuectl.BackendConfigName(overwrites.IssueBackend)
 	}
 	if overwrites.Repos != nil {
-		repos := []issuectl.RepoConfigName{}
-
 		for _, repoName := range overwrites.Repos {
-			repos = append(repos, issuectl.RepoConfigName(repoName))
+			overwriteProfile.Repositories = append(overwriteProfile.Repositories, issuectl.RepoConfigName(repoName))
 		}
-
-		overwriteProfile.Repositories = repos
 	}
 
 	if err := conf.UpdateProfile(overwriteProfile); err != nil {

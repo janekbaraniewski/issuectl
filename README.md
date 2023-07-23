@@ -166,7 +166,7 @@ Let's configure GitHub backend for our repository:
 And Jira backend for our issues:
 
 ```bash
-➜ issuectl config backend add --jira-host https://my-org.atlassian.net/jira/ --jira-token "${JIRA_API_TOKEN}" --jira-username "${JIRA_USERNAME}" my-org-jira jira
+➜ issuectl config backend add --jira-host https://my-org.atlassian.net/ --jira-token "${JIRA_API_TOKEN}" --jira-username "${JIRA_USERNAME}" my-org-jira jira
 ```
 
 ### Git Users

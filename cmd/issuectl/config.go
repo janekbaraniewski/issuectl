@@ -251,7 +251,7 @@ func initRepoAddCommand(rootCmd *cobra.Command) {
 		FParseErrWhitelist: cobra.FParseErrWhitelist{UnknownFlags: true},
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) < 3 || len(args) > 3 {
-				return errors.New("you must provide exactly 3 arguments - owner, name and url of repository")
+				return errors.New("you must avide exactly 3 arguments - owner, name and url of repository")
 			}
 			return nil
 		},

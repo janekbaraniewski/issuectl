@@ -36,11 +36,16 @@ func NewJiraClient(email, apiToken, baseURL string) *Jira {
 }
 
 func (j *Jira) GetIssue(owner string, repo RepoConfigName, issueID IssueID) (interface{}, error) {
+	issues, _, err := j.client.Issue.Search("", &jira.SearchOptions{})
+	if err != nil {
+		return nil, err
+	}
+	Log.Infof("Issues: %v", issues)
+
 	issue, _, err := j.client.Issue.Get(string(issueID), nil)
 	if err != nil {
 		return nil, err
 	}
-
 	return issue, nil
 }
 
@@ -56,7 +61,7 @@ func (j *Jira) LinkIssueToRepo(owner string, repo RepoConfigName, issueID IssueI
 	pullRequestURL := fmt.Sprintf("https://github.com/%s/%s/pull/%s", owner, repo, pullRequestID)
 
 	comment := jira.Comment{
-		Body: fmt.Sprintf("A new pull request has been linked: %s", pullRequestURL),
+		Body: fmt.Sprintf("Working on changes here: %s", pullRequestURL),
 	}
 	_, _, err := j.client.Issue.AddComment(string(issueID), &comment)
 	if err != nil {
