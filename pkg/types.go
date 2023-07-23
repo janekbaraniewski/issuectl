@@ -78,7 +78,8 @@ type IssueID string
 type IssueConfig struct {
 	Name         string            `yaml:"name"`
 	ID           IssueID           `yaml:"id"`
-	BackendName  BackendConfigName `yaml:"backendName"`
+	RepoBackend  BackendConfigName `yaml:"repoBackend"`
+	IssueBackend BackendConfigName `yaml:"issueBackend"`
 	BranchName   string            `yaml:"branchName"`
 	Repositories []RepoConfigName  `yaml:"repositories"`
 	Dir          string            `yaml:"dir"`

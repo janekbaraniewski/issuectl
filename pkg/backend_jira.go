@@ -36,12 +36,6 @@ func NewJiraClient(email, apiToken, baseURL string) *Jira {
 }
 
 func (j *Jira) GetIssue(owner string, repo RepoConfigName, issueID IssueID) (interface{}, error) {
-	issues, _, err := j.client.Issue.Search("", &jira.SearchOptions{})
-	if err != nil {
-		return nil, err
-	}
-	Log.Infof("Issues: %v", issues)
-
 	issue, _, err := j.client.Issue.Get(string(issueID), nil)
 	if err != nil {
 		return nil, err

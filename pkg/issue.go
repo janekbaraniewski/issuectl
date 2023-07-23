@@ -24,7 +24,6 @@ func StartWorkingOnIssue(config IssuectlConfig, issueID IssueID) error {
 	profile := config.GetProfile(config.GetCurrentProfile())
 	repositories := []string{}
 	for _, repoName := range profile.Repositories {
-		Log.Infof("Appending repo %v", repoName)
 		repositories = append(repositories, string(repoName))
 	}
 
@@ -57,7 +56,8 @@ func StartWorkingOnIssue(config IssuectlConfig, issueID IssueID) error {
 		return err
 	}
 
-	Log.Infof("Started working on issue %v", issueID)
+	Log.Infof("Workspace for %v ready! 🫡", issueID)
+	Log.Infof("Run `issuectl workon %v` to open it in VS Code", issueID)
 	return nil
 }
 
@@ -104,11 +104,11 @@ func getBranchName(config IssuectlConfig, issueBackend IssueBackend, profile *Pr
 	default:
 		return "", fmt.Errorf("Missing issue type")
 	case *github.Issue:
-		Log.Infof("%v", t)
+		Log.V(5).Infof("%v", t)
 		branchName := fmt.Sprintf("%v-%v", issueID, strings.ReplaceAll(*issue.(*github.Issue).Title, " ", "-"))
 		return branchName, nil
 	case *jira.Issue:
-		Log.Infof("%v", t)
+		Log.V(5).Infof("%v", t)
 		branchName := fmt.Sprintf("%v-%v", issueID, strings.ReplaceAll(issue.(*jira.Issue).Fields.Summary, " ", "-"))
 		return branchName, nil
 	}
@@ -118,12 +118,13 @@ func getBranchName(config IssuectlConfig, issueBackend IssueBackend, profile *Pr
 func createAndAddRepositoriesToIssue(
 	config IssuectlConfig, profile *Profile, issueID IssueID, issueDirPath string, branchName, issueTitle string, repositories []string) (*IssueConfig, error) {
 	newIssue := &IssueConfig{
-		Name:        issueTitle,
-		ID:          issueID,
-		BranchName:  branchName,
-		BackendName: "github",
-		Dir:         issueDirPath,
-		Profile:     profile.Name,
+		Name:         issueTitle,
+		ID:           issueID,
+		BranchName:   branchName,
+		RepoBackend:  profile.RepoBackend,
+		IssueBackend: profile.IssueBackend,
+		Dir:          issueDirPath,
+		Profile:      profile.Name,
 	}
 
 	for _, repoName := range repositories {
@@ -144,7 +145,7 @@ func cloneAndAddRepositoryToIssue(config IssuectlConfig, profile *Profile, issue
 		return fmt.Errorf("Repo %v not defined.", repoName)
 	}
 
-	Log.Infof("Cloning repo %v", repo.Name)
+	Log.V(3).Infof("Cloning repo %v", repo.Name)
 
 	repoDirPath, err := cloneRepo(repo, issueDirPath, gitUser)
 	if err != nil {
@@ -175,6 +176,8 @@ func OpenPullRequest(issueID IssueID) error {
 		return err
 	}
 
+	Log.Infof("Opening PR for issue %v in %v", issueID, profile.RepoBackend)
+
 	repo := config.GetRepository(profile.DefaultRepository)
 	prId, err := repoBackend.OpenPullRequest(
 		repo.Owner,
@@ -192,6 +195,8 @@ func OpenPullRequest(issueID IssueID) error {
 	if err != nil {
 		return err
 	}
+	Log.Infof("Linking PR %v to issue %v in %v", prId, issueID, profile.IssueBackend)
+
 	return issueBackend.LinkIssueToRepo(repo.Owner, repo.Name, issueID, strconv.Itoa(*prId))
 }
 
