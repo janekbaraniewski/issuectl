@@ -91,7 +91,7 @@ func initBackendAddCommand(rootCmd *cobra.Command) {
 	var flags *_flags = &_flags{}
 
 	addCmd := &cobra.Command{
-		Use:   "add [name] [config]",
+		Use:   "add [name] [type]",
 		Short: "Add a new backend",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -245,7 +245,7 @@ func initRepoListCommand(rootCmd *cobra.Command) {
 
 func initRepoAddCommand(rootCmd *cobra.Command) {
 	repoAddCmd := &cobra.Command{
-		Use:                "add",
+		Use:                "add [owner] [name] [url]",
 		Short:              "Add a new repository",
 		Long:               `Add a new repository`,
 		FParseErrWhitelist: cobra.FParseErrWhitelist{UnknownFlags: true},
