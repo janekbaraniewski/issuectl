@@ -7,7 +7,8 @@ type ProfileName string
 type Profile struct {
 	Name         ProfileName       `yaml:"name"`
 	WorkDir      string            `yaml:"workDir"`
-	Backend      BackendConfigName `yaml:"backend"`
+	IssueBackend BackendConfigName `yaml:"issueBackend"`
+	RepoBackend  BackendConfigName `yaml:"repoBackend"`
 	GitUserName  GitUserName       `yaml:"gituser"`
 	Repositories []RepoConfigName  `yaml:"repositories"`
 

@@ -33,13 +33,16 @@ func initProfileListCommand(rootCmd *cobra.Command) {
 			config := issuectl.LoadConfig()
 			profiles := config.GetProfiles()
 			w := tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', 0)
-			fmt.Fprintln(w, "NAME\tWORK DIR\tGIT USER\tBACKEND\tREPOSITORIES\t")
+			fmt.Fprintln(w, "NAME\tWORK DIR\tGIT USER\tISSUE BACKEND\tREPO BACKEND\tREPOSITORIES\t")
 			for _, profile := range profiles {
 				repos := []string{}
 				for _, repoName := range profile.Repositories {
 					repos = append(repos, string(repoName))
 				}
-				fmt.Fprintln(w, fmt.Sprintf("%v\t%v\t%v\t%v\t%v\t", profile.Name, profile.WorkDir, profile.GitUserName, profile.Backend, repos))
+				fmt.Fprintln(w, fmt.Sprintf(
+					"%v\t%v\t%v\t%v\t%v\t%v\t",
+					profile.Name, profile.WorkDir, profile.GitUserName, profile.IssueBackend, profile.RepoBackend, repos,
+				))
 			}
 			w.Flush()
 		},
@@ -50,22 +53,28 @@ func initProfileListCommand(rootCmd *cobra.Command) {
 
 func initProfileAddCommand(rootCmd *cobra.Command) {
 	addCmd := &cobra.Command{
-		Use:   "add [name] [workdir]",
+		Use:   "add [name] [workdir] [backend] [git user]",
 		Short: "Add a new profile",
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			config := issuectl.LoadConfig()
+			config := issuectl.LoadConfig().GetPersistent()
 			profileName := args[0]
 			workDir := args[1]
+			backend := args[2]
+			gitUser := args[3]
+			defaultRepo := args[4]
 			repos := []issuectl.RepoConfigName{}
 			for _, repoName := range Flags.Repos {
 				repos = append(repos, (issuectl.RepoConfigName)(repoName))
 			}
 			newProfile := &issuectl.Profile{
-				Name:         issuectl.ProfileName(profileName),
-				WorkDir:      workDir,
-				Repositories: repos,
-				Backend:      "github",
+				Name:              issuectl.ProfileName(profileName),
+				WorkDir:           workDir,
+				Repositories:      repos,
+				IssueBackend:      issuectl.BackendConfigName(backend),
+				RepoBackend:       "github-priv",
+				GitUserName:       issuectl.GitUserName(gitUser),
+				DefaultRepository: issuectl.RepoConfigName(defaultRepo),
 			}
 			return config.AddProfile(newProfile)
 		},
@@ -88,7 +97,7 @@ func initProfileDeleteCommand(rootCmd *cobra.Command) {
 		Short: "Delete a profile",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			config := issuectl.LoadConfig()
+			config := issuectl.LoadConfig().GetPersistent()
 			profileName := args[0]
 			return config.DeleteProfile(issuectl.ProfileName(profileName))
 		},
@@ -103,7 +112,7 @@ func initProfileUseCommand(rootCmd *cobra.Command) {
 		Short: "Use a profile",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			config := issuectl.LoadConfig()
+			config := issuectl.LoadConfig().GetPersistent()
 			profileName := args[0]
 			return config.UseProfile(issuectl.ProfileName(profileName))
 		},

@@ -33,11 +33,11 @@ var DefaultSSHKeyPath = getDefaultSSHKeyPath()
 // IssuectlConfig manages configuration
 type issuectlConfig struct {
 	CurrentProfile ProfileName                          `yaml:"currentProfile"`
-	Repositories   map[RepoConfigName]*RepoConfig       `yaml:"repositories"`
-	Issues         map[IssueID]*IssueConfig             `yaml:"issues"`
-	Profiles       map[ProfileName]*Profile             `yaml:"profiles"`
-	Backends       map[BackendConfigName]*BackendConfig `yaml:"backends"`
-	GitUsers       map[GitUserName]*GitUser             `yaml:"gitUsers"`
+	Repositories   map[RepoConfigName]*RepoConfig       `yaml:"repositories,omitempty"`
+	Issues         map[IssueID]*IssueConfig             `yaml:"issues,omitempty"`
+	Profiles       map[ProfileName]*Profile             `yaml:"profiles,omitempty"`
+	Backends       map[BackendConfigName]*BackendConfig `yaml:"backends,omitempty"`
+	GitUsers       map[GitUserName]*GitUser             `yaml:"gitUsers,omitempty"`
 
 	_persistenceMode string `yaml:"-"`
 }
@@ -107,7 +107,7 @@ var persistentFlagHandle = func(c IssuectlConfig) error {
 var inMemoryFlagHandle = func(_ IssuectlConfig) error { return nil }
 
 func LoadConfig() IssuectlConfig {
-	config := &issuectlConfig{}
+	config := GetEmptyConfig()
 
 	data, err := os.ReadFile(DefaultConfigFilePath)
 	if err != nil {
