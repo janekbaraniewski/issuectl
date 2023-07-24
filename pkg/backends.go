@@ -27,6 +27,7 @@ type IssueBackend interface {
 	CloseIssue(owner string, repo RepoConfigName, issueID IssueID) error
 	StartIssue(owner string, repo RepoConfigName, issueID IssueID) error
 	GetIssue(owner string, repo RepoConfigName, issueID IssueID) (interface{}, error)
+	GetIssueURL(owner string, repo RepoConfigName, issueID IssueID) (string, error)
 }
 
 type RepositoryBackend interface {

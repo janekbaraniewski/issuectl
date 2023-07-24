@@ -28,6 +28,15 @@ func (g *GitLab) GetIssue(owner string, repo RepoConfigName, issueID IssueID) (i
 	return nil, nil
 }
 
+func (g *GitLab) GetIssueURL(owner string, repo RepoConfigName, issueID IssueID) (string, error) {
+	issueNumber, err := getIssueNumberFromString(issueID)
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("https://gitlab.com/%s/%s/-/issues/%d", owner, repo, issueNumber), nil
+}
+
 func (g *GitLab) CloseIssue(owner string, repo RepoConfigName, issueID IssueID) error {
 	issueNumber, err := getIssueNumberFromString(issueID)
 	if err != nil {
