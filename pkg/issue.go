@@ -31,7 +31,7 @@ func StartWorkingOnIssue(config IssuectlConfig, issueID IssueID) error {
 		return fmt.Errorf("issueID already found in local configuration")
 	}
 
-	Log.Infof("Starting work on issue %v ...", issueID)
+	Log.Infof("    🏗️\tPreparing workspace for issue %v...", issueID)
 
 	issueBackend, issueDirPath, err := initializeIssueBackendAndDir(config, profile, issueID)
 	if err != nil {
@@ -43,10 +43,14 @@ func StartWorkingOnIssue(config IssuectlConfig, issueID IssueID) error {
 		return err
 	}
 
+	Log.Infof("    🛬\tCloning repositories %v", repositories)
+
 	newIssue, err := createAndAddRepositoriesToIssue(config, profile, issueID, issueDirPath, branchName, branchName, repositories)
 	if err != nil {
 		return err
 	}
+
+	Log.Infof("    🫡\tMarking issue as In Progress in %v", profile.IssueBackend)
 
 	if err := issueBackend.StartIssue("", "", issueID); err != nil {
 		return err
@@ -56,8 +60,8 @@ func StartWorkingOnIssue(config IssuectlConfig, issueID IssueID) error {
 		return err
 	}
 
-	Log.Infof("Workspace for %v ready! 🫡", issueID)
-	Log.Infof("Run `issuectl workon %v` to open it in VS Code", issueID)
+	Log.Infof("    🚀\tWorkspace for %v ready!", issueID)
+	Log.Infof("    🧑‍💻\tRun `issuectl workon %v` to open it in VS Code", issueID)
 	return nil
 }
 
@@ -201,14 +205,21 @@ func OpenPullRequest(issueID IssueID) error {
 		return err
 	}
 
-	Log.Infof("Opening PR for issue %v in %v", issueID, profile.RepoBackend)
-
 	repo := config.GetRepository(profile.DefaultRepository)
+
+	Log.Infof(
+		"    📂\tOpening PR for issue %v in %v/%v [%v]",
+		issueID,
+		repo.Owner,
+		repo.Name,
+		profile.RepoBackend,
+	)
+
 	prId, err := repoBackend.OpenPullRequest(
 		repo.Owner,
 		repo.Name,
 		fmt.Sprintf("%v | %v", issue.ID, issue.Name),
-		fmt.Sprintf("Resolves #%v", issue.ID),
+		fmt.Sprintf("Resolves #%v ✅", issue.ID),
 		"master", // TODO: make configurable
 		issue.BranchName,
 	)
@@ -220,7 +231,7 @@ func OpenPullRequest(issueID IssueID) error {
 	if err != nil {
 		return err
 	}
-	Log.Infof("Linking PR %v to issue %v in %v", prId, issueID, profile.IssueBackend)
+	Log.Infof("    🔗\tLinking PR %v to issue %v in %v", prId, issueID, profile.IssueBackend)
 
 	return issueBackend.LinkIssueToRepo(repo.Owner, repo.Name, issueID, strconv.Itoa(*prId))
 }
@@ -231,10 +242,14 @@ func FinishWorkingOnIssue(issueID IssueID) error {
 	profile := config.GetProfile(config.GetCurrentProfile())
 	repo := config.GetRepository(profile.DefaultRepository)
 
+	Log.Infof("    🥂\tFinishing work on %v", issueID)
+
 	issueBackend, err := getIssueBackendConfigurator(config.GetBackend(profile.IssueBackend))
 	if err != nil {
 		return err
 	}
+
+	Log.Infof("    🏁\tClosing issue %v in %v", issueID, profile.IssueBackend)
 
 	err = issueBackend.CloseIssue(
 		repo.Owner,
@@ -245,16 +260,24 @@ func FinishWorkingOnIssue(issueID IssueID) error {
 		return fmt.Errorf(errFailedToCloseIssue, err)
 	}
 
-	Log.Infof("Cleaning up after work on issue %v", issueID)
-
 	issue, found := config.GetIssue(issueID)
 	if !found {
 		return errors.New(errIssueIDNotFound)
 	}
 
+	Log.Infof("    🧹\tCleaning up issue workdir")
+
 	if err := os.RemoveAll(issue.Dir); err != nil {
 		return err
 	}
 
-	return config.DeleteIssue(issueID)
+	Log.Infof("    🫥\tRemoving issue config")
+
+	if err := config.DeleteIssue(issueID); err != nil {
+		return err
+	}
+
+	Log.Infof("    👍\tAll done!")
+
+	return nil
 }
