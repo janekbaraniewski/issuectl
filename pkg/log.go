@@ -23,7 +23,7 @@ func (l *Logger) Infof(format string, v ...interface{}) {
 
 // Infofp formats the log message, adds prefix to it and calls output function with default level 1
 func (l *Logger) Infofp(emoji string, format string, v ...interface{}) {
-	l.output(1, fmt.Sprintf("%v %v", emoji, fmt.Sprintf(format, v...)))
+	l.output(1, fmt.Sprintf("    %v\t%v", emoji, fmt.Sprintf(format, v...)))
 }
 
 // V returns a verbosityLogger with the specified verbosity level
