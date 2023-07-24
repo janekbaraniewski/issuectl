@@ -100,16 +100,41 @@ func getBranchName(config IssuectlConfig, issueBackend IssueBackend, profile *Pr
 		return "", fmt.Errorf(errFailedToGetIssue, err)
 	}
 
+	toReplace := []string{
+		" ",
+		",",
+		":",
+		"|",
+		";",
+		"(",
+		")",
+		"#",
+		"@",
+		"!",
+		".",
+		"$",
+		"%",
+		"^",
+		"&",
+		"*",
+	}
+
 	switch t := issue.(type) {
 	default:
 		return "", fmt.Errorf("Missing issue type")
 	case *github.Issue:
 		Log.V(5).Infof("%v", t)
-		branchName := fmt.Sprintf("%v-%v", issueID, strings.ReplaceAll(*issue.(*github.Issue).Title, " ", "-"))
+		branchName := fmt.Sprintf("%v-%v", issueID, *issue.(*github.Issue).Title)
+		for _, charToReplace := range toReplace {
+			branchName = strings.ReplaceAll(branchName, charToReplace, "-")
+		}
 		return branchName, nil
 	case *jira.Issue:
 		Log.V(5).Infof("%v", t)
-		branchName := fmt.Sprintf("%v-%v", issueID, strings.ReplaceAll(issue.(*jira.Issue).Fields.Summary, " ", "-"))
+		branchName := fmt.Sprintf("%v-%v", issueID, issue.(*jira.Issue).Fields.Summary)
+		for _, charToReplace := range toReplace {
+			branchName = strings.ReplaceAll(branchName, charToReplace, "-")
+		}
 		return branchName, nil
 	}
 }

@@ -6,6 +6,12 @@ import (
 	"strconv"
 )
 
+const (
+	DefaultStartMessage  = "On it 👀"
+	DefaultCloseMessage  = "✅"
+	DefaultOpenPRMessage = "Working on changes here: %s"
+)
+
 // getIssueNumberFromString converts IssueID to int
 func getIssueNumberFromString(issueID IssueID) (int, error) {
 	issueNumber, err := strconv.Atoi(string(issueID))

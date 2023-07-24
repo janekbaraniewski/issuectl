@@ -281,6 +281,8 @@ Let's configure GitHub backend for our repository:
 
 And Jira backend for our issues:
 
+> Please remember you have to use Jira with language set to English (US)
+
 ```bash
 ➜ issuectl config backend add \
     --jira-host https://my-org.atlassian.net/ \
