@@ -38,6 +38,7 @@ type issuectlConfig struct {
 	Profiles       map[ProfileName]*Profile             `yaml:"profiles,omitempty"`
 	Backends       map[BackendConfigName]*BackendConfig `yaml:"backends,omitempty"`
 	GitUsers       map[GitUserName]*GitUser             `yaml:"gitUsers,omitempty"`
+	Config         TextConfig                           `yaml:"config,omitempty"`
 
 	_persistenceMode string `yaml:"-"`
 }
