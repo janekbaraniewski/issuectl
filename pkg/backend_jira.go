@@ -14,11 +14,9 @@ type Jira struct {
 }
 
 const (
-	ToDo                = "To Do"
-	InProgress          = "In Progress"
-	Done                = "Done"
-	DefaultStartMessage = "On it 👀"
-	DefaultCloseMessage = "✅"
+	ToDo       = "To Do"
+	InProgress = "In Progress"
+	Done       = "Done"
 )
 
 func NewJiraClient(email, apiToken, baseURL string) *Jira {
@@ -55,7 +53,7 @@ func (j *Jira) LinkIssueToRepo(owner string, repo RepoConfigName, issueID IssueI
 	pullRequestURL := fmt.Sprintf("https://github.com/%s/%s/pull/%s", owner, repo, pullRequestID)
 
 	comment := jira.Comment{
-		Body: fmt.Sprintf("Working on changes here: %s", pullRequestURL),
+		Body: fmt.Sprintf(DefaultOpenPRMessage, pullRequestURL),
 	}
 	_, _, err := j.client.Issue.AddComment(string(issueID), &comment)
 	if err != nil {
@@ -91,6 +89,7 @@ func (j *Jira) moveIssueToState(issueID IssueID, desiredState string, message st
 	}
 
 	if transitionID == "" {
+		Log.V(3).Infof("Failed looking for transition %v in list of transitions %v", desiredState, transitions)
 		return fmt.Errorf("unable to find '%s' transition", desiredState)
 	}
 
