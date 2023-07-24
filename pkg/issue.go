@@ -207,8 +207,7 @@ func OpenPullRequest(issueID IssueID) error {
 
 	repo := config.GetRepository(profile.DefaultRepository)
 
-	Log.Infof(
-		"    📂\tOpening PR for issue %v in %v/%v [%v]",
+	Log.Infofp("📂", "Opening PR for issue %v in %v/%v [%v]",
 		issueID,
 		repo.Owner,
 		repo.Name,
@@ -231,7 +230,7 @@ func OpenPullRequest(issueID IssueID) error {
 	if err != nil {
 		return err
 	}
-	Log.Infof("    🔗\tLinking PR %v to issue %v in %v", prId, issueID, profile.IssueBackend)
+	Log.Infofp("🔗", "Linking PR %v to issue %v in %v", prId, issueID, profile.IssueBackend)
 
 	return issueBackend.LinkIssueToRepo(repo.Owner, repo.Name, issueID, strconv.Itoa(*prId))
 }
@@ -247,14 +246,14 @@ func FinishWorkingOnIssue(issueID IssueID) error {
 
 	repo := config.GetRepository(profile.DefaultRepository)
 
-	Log.Infof("    🥂\tFinishing work on %v", issueID)
+	Log.Infofp("🥂", "Finishing work on %v", issueID)
 	if profile.IssueBackend != "" {
 		issueBackend, err := getIssueBackendConfigurator(config.GetBackend(profile.IssueBackend))
 		if err != nil {
 			return err
 		}
 
-		Log.Infof("    🏁\tClosing issue %v in %v", issueID, profile.IssueBackend)
+		Log.Infofp("🏁", "Closing issue %v in %v", issueID, profile.IssueBackend)
 
 		err = issueBackend.CloseIssue(
 			repo.Owner,
@@ -267,19 +266,19 @@ func FinishWorkingOnIssue(issueID IssueID) error {
 
 	}
 
-	Log.Infof("    🧹\tCleaning up issue workdir")
+	Log.Infofp("🧹", "Cleaning up issue workdir")
 
 	if err := os.RemoveAll(issue.Dir); err != nil {
 		return err
 	}
 
-	Log.Infof("    🫥\tRemoving issue config")
+	Log.Infofp("🫥", "Removing issue config")
 
 	if err := config.DeleteIssue(issueID); err != nil {
 		return err
 	}
 
-	Log.Infof("    👍\tAll done!")
+	Log.Infofp("👍", "All done!")
 
 	return nil
 }
