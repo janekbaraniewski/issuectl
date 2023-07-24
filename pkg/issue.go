@@ -52,7 +52,10 @@ func StartWorkingOnIssue(config IssuectlConfig, issueID IssueID) error {
 
 	Log.Infof("    🫡\tMarking issue as In Progress in %v", profile.IssueBackend)
 
-	if err := issueBackend.StartIssue("", "", issueID); err != nil {
+	// FIXME: this is a workaround for github. we should move this to backend
+	issueRepo := config.GetRepository(profile.DefaultRepository)
+
+	if err := issueBackend.StartIssue(issueRepo.Owner, issueRepo.Name, issueID); err != nil {
 		return err
 	}
 
