@@ -320,7 +320,8 @@ Flags:
 ➜ issuectl config profile add \
     -r repoName \
     work \
-    /Users/johndoe/Workspace/myorg my-org-jira \
+    /Users/johndoe/Workspace/myorg \
+    my-org-jira \
     my-org-github \
     "John Doe" \
     repoName
