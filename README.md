@@ -112,6 +112,18 @@ This will:
 
 ---
 
+### List
+
+List all your in progress issues simply by running
+
+```bash
+➜ issuectl list
+ID    Name                      Repository Backend Issue Backend Branch                    Repositories    Profile
+XY-69 XY-69-test-task-from-jira github-priv        my-org-jira   XY-69-test-task-from-jira [myRepo]        work
+44    44-test-task-from-github  github-priv        github-priv   44-test-task-from-github  [myPrivProject] priv
+```
+
+---
 ### Work
 
 ```bash
