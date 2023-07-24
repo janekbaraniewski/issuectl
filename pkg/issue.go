@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/andygrunwald/go-jira"
 	"github.com/google/go-github/github"
@@ -234,7 +235,7 @@ func OpenPullRequest(issueID IssueID) error {
 		return err
 	}
 	Log.Infofp("🔗", "Linking PR %v to issue %v in %v", *prId, issueID, profile.IssueBackend)
-
+	time.Sleep(time.Second * 2) // FIXME: PR might not yet be available in API
 	return issueBackend.LinkIssueToRepo(repo.Owner, repo.Name, issueID, strconv.Itoa(*prId))
 }
 
