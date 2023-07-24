@@ -1,11 +1,9 @@
 package issuectl
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
-	"net/http"
+	"strconv"
 
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
@@ -85,30 +83,21 @@ func (g *GitHub) OpenPullRequest(owner string, repo RepoConfigName, title, body,
 }
 
 func (g *GitHub) LinkIssueToRepo(owner string, repo RepoConfigName, issueID IssueID, pullRequestID string) error {
-	url := fmt.Sprintf("%s/repos/%s/%s/issues/%s/timeline", g.baseURL, owner, repo, issueID)
-	body := map[string]string{
-		"issue_number": pullRequestID,
-	}
-	bodyBytes, err := json.Marshal(body)
+	// Convert the pull request ID from string to int
+	pullRequestNumber, err := strconv.Atoi(pullRequestID)
 	if err != nil {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(bodyBytes))
+	// Create a comment on the pull request that references the issue
+	comment := &github.IssueComment{
+		Body: github.String(fmt.Sprintf("Resolves #%s", issueID)),
+	}
+
+	// Post the comment to the pull request
+	_, _, err = g.client.Issues.CreateComment(context.Background(), owner, string(repo), pullRequestNumber, comment)
 	if err != nil {
 		return err
-	}
-	req.Header.Set("Authorization", "Bearer "+g.token)
-	req.Header.Set("Accept", "application/vnd.github.starfire-preview+json")
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusCreated {
-		return fmt.Errorf("failed to link issue to pull request: status code %d", resp.StatusCode)
 	}
 
 	return nil
