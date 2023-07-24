@@ -20,7 +20,7 @@ const (
 )
 
 // StartWorkingOnIssue starts work on an issue
-func StartWorkingOnIssue(config IssuectlConfig, issueID IssueID) error {
+func StartWorkingOnIssue(customIssueName string, config IssuectlConfig, issueID IssueID) error {
 	profile := config.GetProfile(config.GetCurrentProfile())
 	repositories := []string{}
 	for _, repoName := range profile.Repositories {
@@ -34,6 +34,9 @@ func StartWorkingOnIssue(config IssuectlConfig, issueID IssueID) error {
 	Log.Infofp("🏗️", "Preparing workspace for issue %v...", issueID)
 
 	name := string(issueID)
+	if customIssueName != "" {
+		name = fmt.Sprintf("%v-%v", name, customIssueName)
+	}
 	dirName := name
 	branchName := name
 
