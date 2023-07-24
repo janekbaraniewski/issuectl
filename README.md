@@ -94,7 +94,7 @@ gitUsers:
 ```
 
 ```bash
-➜ ➜ issuectl start XY-99
+➜ issuectl start XY-99
 Starting work on issue XY-99 ...
 Workspace for XY-99 ready! 🫡
 Run `issuectl workon XY-99` to open it in VS Code
@@ -315,14 +315,15 @@ Flags:
 ```
 
 ```bash
-➜ issuectl profile add \
+➜ issuectl config profile add \
     -r repoName \
     work \
     /Users/johndoe/Workspace/myorg my-org-jira \
     my-org-github \
     "John Doe" \
     repoName
-➜ issuectl use work
+
+➜ issuectl config profile use work
 ```
 
 This will create a profile which will clone `repoName` for each issue. You might want to clone multiple repositories, depending on your environment. For this, run
