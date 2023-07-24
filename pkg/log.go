@@ -6,7 +6,6 @@ import (
 	"os"
 	"runtime"
 	"strings"
-	"time"
 )
 
 // Logger struct holds the verbosity level
@@ -47,7 +46,8 @@ func (l *Logger) output(level int, message string) {
 		file = file[strings.LastIndex(file, "/")+1:]
 		log.SetOutput(os.Stdout)
 		log.SetFlags(0)
-		log.Printf("%v|%s| %s\n", time.Now().Format(time.RFC3339), file, message)
+		// log.Printf("❖ %v|%s| %s\n", time.Now().Format(time.RFC3339), file, message)
+		log.Printf("%s\n", message)
 	}
 }
 
