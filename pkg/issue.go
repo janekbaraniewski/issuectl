@@ -191,6 +191,39 @@ func cloneAndAddRepositoryToIssue(config IssuectlConfig, profile *Profile, issue
 	return nil
 }
 
+func AddRepoToIssue(repoName string, issueID IssueID) error {
+	Log.Infofp("➡️", "Adding repo %v to issue %v", repoName, issueID)
+	config := LoadConfig()
+	issue, found := config.GetIssue(issueID)
+	if !found {
+		return fmt.Errorf("Issue not found")
+	}
+	profile := config.GetProfile(issue.Profile)
+	gitUser, found := config.GetGitUser(profile.GitUserName)
+	if !found {
+		return fmt.Errorf("Git user not found")
+	}
+	repo := config.GetRepository(RepoConfigName(repoName))
+	if repo == nil {
+		return fmt.Errorf("Repo %v not defined", repoName)
+	}
+
+	issue.Repositories = append(issue.Repositories, repo.Name)
+
+	Log.Infofp("🛬", "Cloning repository")
+	repoDirPath, err := cloneRepo(repo, issue.Dir, gitUser)
+	if err != nil {
+		return err
+	}
+
+	Log.Infofp("🎋", "Setting up branch")
+	if err := createBranch(repoDirPath, issue.BranchName, gitUser); err != nil {
+		return err
+	}
+	Log.Infofp("🚀", "Done!")
+	return config.AddIssue(issue)
+}
+
 // OpenPullRequest opens pull request
 func OpenPullRequest(issueID IssueID) error {
 	config := LoadConfig()
