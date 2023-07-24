@@ -94,10 +94,12 @@ gitUsers:
 ```
 
 ```bash
-➜ issuectl start XY-99
-Starting work on issue XY-99 ...
-Workspace for XY-99 ready! 🫡
-Run `issuectl workon XY-99` to open it in VS Code
+➜ issuectl start XY-321
+    🏗️	Preparing workspace for issue XY-321...
+    🛬	Cloning repositories [my-secret-project]
+    🫡	Marking issue as In Progress in my-org-jira
+    🚀	Workspace for XY-321 ready!
+    🧑‍💻	Run `issuectl workon XY-321` to open it in VS Code
 ```
 
 This will:
@@ -176,9 +178,11 @@ this will make your interaction with CLI more natural! Check this out:
 
 ```bash
 ➜ i start OPS-123
-Starting work on issue OPS-123 ...
-Workspace for OPS-123 ready! 🫡
-Run `issuectl workon OPS-123` to open it in VS Code
+    🏗️	Preparing workspace for issue OPS-123...
+    🛬	Cloning repositories [my-secret-project]
+    🫡	Marking issue as In Progress in my-org-jira
+    🚀	Workspace for OPS-123 ready!
+    🧑‍💻	Run `issuectl workon OPS-123` to open it in VS Code
 ```
 
 ```bash
@@ -187,13 +191,18 @@ Run `issuectl workon OPS-123` to open it in VS Code
 
 ```bash
 ➜ i openpr OPS-123
-Opening PR for issue OPS-123 in github-priv
-Linking PR 321 to issue OPS-123 in my-org-jira
+    📂	Opening PR for issue OPS-123 in janekbaraniewski/issuectl [github-priv]
+    🔗	Linking PR 321 to issue OPS-123 in jira-priv
+
 ```
 
 ```bash
-➜ i finish IS-2
-Cleaning up after work on issue IS-2
+➜ i finish OPS-123
+    🥂	Finishing work on OPS-123
+    🏁	Closing issue OPS-123 in jira-priv
+    🧹	Cleaning up issue workdir
+    🫥	Removing issue config
+    👍	All done!
 ```
 
 > This is a basic idea of workflow and what systems this can interact with at each step.
