@@ -233,7 +233,7 @@ func OpenPullRequest(issueID IssueID) error {
 	if err != nil {
 		return err
 	}
-	Log.Infofp("🔗", "Linking PR %v to issue %v in %v", prId, issueID, profile.IssueBackend)
+	Log.Infofp("🔗", "Linking PR %v to issue %v in %v", *prId, issueID, profile.IssueBackend)
 
 	return issueBackend.LinkIssueToRepo(repo.Owner, repo.Name, issueID, strconv.Itoa(*prId))
 }
