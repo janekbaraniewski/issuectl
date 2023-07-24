@@ -40,7 +40,7 @@ func StartWorkingOnIssue(customIssueName string, config IssuectlConfig, issueID 
 	dirName := name
 	branchName := name
 
-	if profile.IssueBackend != "" {
+	if profile.IssueBackend != "" && customIssueName == "" {
 		backendConfig := config.GetBackend(profile.IssueBackend)
 		issueBackend, err := getIssueBackendConfigurator(backendConfig)
 		if err != nil {
