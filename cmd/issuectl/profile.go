@@ -33,15 +33,15 @@ func initProfileListCommand(rootCmd *cobra.Command) {
 			config := issuectl.LoadConfig()
 			profiles := config.GetProfiles()
 			w := tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', 0)
-			fmt.Fprintln(w, "NAME\tWORK DIR\tGIT USER\tISSUE BACKEND\tREPO BACKEND\tREPOSITORIES\t")
+			fmt.Fprintln(w, "NAME\tWORK DIR\tGIT USER\tREPOSITORIES\t")
 			for _, profile := range profiles {
 				repos := []string{}
 				for _, repoName := range profile.Repositories {
 					repos = append(repos, string(repoName))
 				}
 				fmt.Fprintln(w, fmt.Sprintf( //nolint
-					"%v\t%v\t%v\t%v\t%v\t%v\t",
-					profile.Name, profile.WorkDir, profile.GitUserName, profile.IssueBackend, profile.RepoBackend, repos,
+					"%v\t%v\t%v\t%v\t",
+					profile.Name, profile.WorkDir, profile.GitUserName, repos,
 				))
 			}
 			w.Flush()
