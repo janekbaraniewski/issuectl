@@ -13,6 +13,7 @@ type CLIOverwrites struct {
 	Profile      string
 	IssueBackend string
 	RepoBackend  string
+	IssueName    string
 }
 
 var Flags CLIOverwrites
@@ -62,7 +63,7 @@ func initStartCommand(rootCmd *cobra.Command) {
 			if err != nil {
 				return err
 			}
-			if err := issuectl.StartWorkingOnIssue(config.GetPersistent(), issuectl.IssueID(args[0])); err != nil {
+			if err := issuectl.StartWorkingOnIssue(Flags.IssueName, config.GetPersistent(), issuectl.IssueID(args[0])); err != nil {
 				// TODO: rollback changes made by StartWorkingOnIssue
 				return err
 			}
@@ -101,6 +102,14 @@ func initStartCommand(rootCmd *cobra.Command) {
 		"",
 		"",
 		"Name of repo backend to use for command",
+	)
+
+	startCmd.PersistentFlags().StringVarP(
+		&Flags.IssueName,
+		"name",
+		"n",
+		"",
+		"Custom issue name to use [defaults to IssueID]. IssueID will be added as prefix of custom name.",
 	)
 
 	rootCmd.AddCommand(startCmd)
