@@ -14,7 +14,7 @@ const CodeEditorVSCode string = "code"
 
 func initWorkonIssueCommand(rootCmd *cobra.Command) {
 	var openIssueCmd = &cobra.Command{
-		Use:   "workon [issueID]", // TODO: this might be better called using different name? `open` sudgests that we'll open some issue in issue backend. maybe `work`?
+		Use:   "workon [issueID]",
 		Short: "Open specified issue in the preferred code editor",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {

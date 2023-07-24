@@ -93,6 +93,13 @@ gitUsers:
 ➜ issuectl start [issueNumber]
 ```
 
+```bash
+➜ ➜ issuectl start XY-99
+Starting work on issue XY-99 ...
+Workspace for XY-99 ready! 🫡
+Run `issuectl workon XY-99` to open it in VS Code
+```
+
 This will:
 
 - create a new work directory for your issue
