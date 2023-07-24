@@ -33,12 +33,21 @@ func StartWorkingOnIssue(config IssuectlConfig, issueID IssueID) error {
 
 	Log.Infofp("🏗️", "Preparing workspace for issue %v...", issueID)
 
-	issueBackend, issueDirPath, err := initializeIssueBackendAndDir(config, profile, issueID)
-	if err != nil {
-		return err
+	name := string(issueID)
+	dirName := name
+	branchName := name
+
+	if profile.IssueBackend != "" {
+		backendConfig := config.GetBackend(profile.IssueBackend)
+		issueBackend, err := getIssueBackendConfigurator(backendConfig)
+		if err != nil {
+			return err
+		}
+		generatedBranchName, err := getBranchName(config, issueBackend, profile, issueID)
+		branchName = generatedBranchName
 	}
 
-	branchName, err := getBranchName(config, issueBackend, profile, issueID)
+	issueDirPath, err := createDirectory(profile.WorkDir, dirName)
 	if err != nil {
 		return err
 	}
@@ -56,6 +65,11 @@ func StartWorkingOnIssue(config IssuectlConfig, issueID IssueID) error {
 		// FIXME: this is a workaround for github. we should move this to backend
 		issueRepo := config.GetRepository(profile.DefaultRepository)
 
+		backendConfig := config.GetBackend(profile.IssueBackend)
+		issueBackend, err := getIssueBackendConfigurator(backendConfig)
+		if err != nil {
+			return err
+		}
 		if err := issueBackend.StartIssue(issueRepo.Owner, issueRepo.Name, issueID); err != nil {
 			return err
 		}
@@ -74,31 +88,6 @@ func StartWorkingOnIssue(config IssuectlConfig, issueID IssueID) error {
 func isIssueIdInUse(config IssuectlConfig, issueID IssueID) bool {
 	_, found := config.GetIssue(issueID)
 	return found
-}
-
-// initializeIssueBackendAndDir prepares IssueBackend and creates directory for issue
-func initializeIssueBackendAndDir(config IssuectlConfig, profile *Profile, issueID IssueID) (IssueBackend, string, error) {
-	backendConfig := config.GetBackend(profile.IssueBackend)
-	issueBackend, err := getIssueBackendConfigurator(backendConfig)
-	if err != nil {
-		return nil, "", err
-	}
-
-	repo := config.GetRepository(profile.DefaultRepository)
-	issueFromBackend, err := issueBackend.GetIssue(repo.Owner, repo.Name, issueID)
-	if err != nil {
-		return nil, "", fmt.Errorf(errIssueDoesNotExistOnBackend, backendConfig.Name, err)
-	}
-	if issueFromBackend == nil {
-		return nil, "", fmt.Errorf("Issue %v not found in backend %v", issueID, backendConfig.Name)
-	}
-
-	issueDirPath, err := createDirectory(profile.WorkDir, string(issueID))
-	if err != nil {
-		return nil, "", err
-	}
-
-	return issueBackend, issueDirPath, nil
 }
 
 // getIssueAndBranchName gets issue and prepares branch name
@@ -200,6 +189,10 @@ func OpenPullRequest(issueID IssueID) error {
 	config := LoadConfig()
 	profile := config.GetProfile(config.GetCurrentProfile())
 
+	if profile.RepoBackend == "" {
+		return errors.New("Repository Backend not defined")
+	}
+
 	issue, found := config.GetIssue(issueID)
 	if !found {
 		return fmt.Errorf(errIssueIDNotFound)
@@ -248,21 +241,23 @@ func FinishWorkingOnIssue(issueID IssueID) error {
 	repo := config.GetRepository(profile.DefaultRepository)
 
 	Log.Infof("    🥂\tFinishing work on %v", issueID)
+	if profile.IssueBackend != "" {
+		issueBackend, err := getIssueBackendConfigurator(config.GetBackend(profile.IssueBackend))
+		if err != nil {
+			return err
+		}
 
-	issueBackend, err := getIssueBackendConfigurator(config.GetBackend(profile.IssueBackend))
-	if err != nil {
-		return err
-	}
+		Log.Infof("    🏁\tClosing issue %v in %v", issueID, profile.IssueBackend)
 
-	Log.Infof("    🏁\tClosing issue %v in %v", issueID, profile.IssueBackend)
+		err = issueBackend.CloseIssue(
+			repo.Owner,
+			repo.Name,
+			issueID,
+		)
+		if err != nil {
+			return fmt.Errorf(errFailedToCloseIssue, err)
+		}
 
-	err = issueBackend.CloseIssue(
-		repo.Owner,
-		repo.Name,
-		issueID,
-	)
-	if err != nil {
-		return fmt.Errorf(errFailedToCloseIssue, err)
 	}
 
 	issue, found := config.GetIssue(issueID)
