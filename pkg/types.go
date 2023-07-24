@@ -85,3 +85,9 @@ type IssueConfig struct {
 	Dir          string            `yaml:"dir"`
 	Profile      ProfileName       `yaml:"profile"`
 }
+
+type TextConfig struct {
+	StartMessage  string `yaml:"startMessage"`
+	CloseMessage  string `yaml:"closeMessage"`
+	OpenPRMessage string `yaml:"openPRMessage"`
+}
