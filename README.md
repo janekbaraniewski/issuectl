@@ -163,6 +163,39 @@ This will:
 
 ![](comment_finish.png)
 ---
+
+### Cool syntax!!!
+
+If you want, you can add alias you tour .bashrc/.zshrc:
+
+```bash
+alias i=issuectl
+```
+
+this will make your interaction with CLI more natural! Check this out:
+
+```bash
+➜ i start OPS-123
+Starting work on issue OPS-123 ...
+Workspace for OPS-123 ready! 🫡
+Run `issuectl workon OPS-123` to open it in VS Code
+```
+
+```bash
+➜ i workon OPS-123
+```
+
+```bash
+➜ i openpr OPS-123
+Opening PR for issue OPS-123 in github-priv
+Linking PR 321 to issue OPS-123 in my-org-jira
+```
+
+```bash
+➜ i finish IS-2
+Cleaning up after work on issue IS-2
+```
+
 > This is a basic idea of workflow and what systems this can interact with at each step.
 ![diagram](diagram.png)
 
