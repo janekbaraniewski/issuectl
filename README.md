@@ -141,6 +141,11 @@ This will open issue directory in your code editor (WARNING! ATM VSCODE IS HARDC
 ```bash
 ➜ issuectl openpr [issueNumber]
 ```
+```bash
+➜ issuectl openpr XY-321
+    📂	Opening PR for issue XY-321 in my-org/my-project [github-work]
+    🔗	Linking PR 321 to issue XY-321 in jira-work
+```
 
 This will:
 
@@ -156,6 +161,15 @@ This will:
 ```bash
 ➜ issuectl finish [issueNumber]
 ```
+```bash
+➜ issuectl finish XY-321
+    🥂	Finishing work on XY-321
+    🏁	Closing issue XY-321 in jira-priv
+    🧹	Cleaning up issue workdir
+    🫥	Removing issue config
+    👍	All done!
+```
+
 
 This will:
 
