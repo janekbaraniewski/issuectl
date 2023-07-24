@@ -225,8 +225,9 @@ func AddRepoToIssue(repoName string, issueID IssueID) error {
 }
 
 // OpenPullRequest opens pull request
-func OpenPullRequest(issueID IssueID) error {
+func OpenPullRequest(issueID IssueID, customTitle string) error {
 	config := LoadConfig()
+
 	issue, found := config.GetIssue(issueID)
 	if !found {
 		return errors.New("Issue not found")
@@ -244,6 +245,11 @@ func OpenPullRequest(issueID IssueID) error {
 
 	repo := config.GetRepository(profile.DefaultRepository)
 
+	title := customTitle
+	if title == "" {
+		title = fmt.Sprintf("%v | %v", issue.ID, issue.Name)
+	}
+
 	Log.Infofp("📂", "Opening PR for issue %v in %v/%v [%v]",
 		issueID,
 		repo.Owner,
@@ -254,7 +260,7 @@ func OpenPullRequest(issueID IssueID) error {
 	prId, err := repoBackend.OpenPullRequest(
 		repo.Owner,
 		repo.Name,
-		fmt.Sprintf("%v | %v", issue.ID, issue.Name),
+		title,
 		fmt.Sprintf("Resolves #%v ✅", issue.ID),
 		"master", // TODO: make configurable
 		issue.BranchName,
