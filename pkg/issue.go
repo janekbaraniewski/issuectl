@@ -187,15 +187,14 @@ func cloneAndAddRepositoryToIssue(config IssuectlConfig, profile *Profile, issue
 // OpenPullRequest opens pull request
 func OpenPullRequest(issueID IssueID) error {
 	config := LoadConfig()
-	profile := config.GetProfile(config.GetCurrentProfile())
+	issue, found := config.GetIssue(issueID)
+	if !found {
+		return errors.New("Issue not found")
+	}
+	profile := config.GetProfile(issue.Profile)
 
 	if profile.RepoBackend == "" {
 		return errors.New("Repository Backend not defined")
-	}
-
-	issue, found := config.GetIssue(issueID)
-	if !found {
-		return fmt.Errorf(errIssueIDNotFound)
 	}
 
 	repoBackend, err := getRepoBackendConfigurator(config.GetBackend(profile.RepoBackend))
@@ -237,7 +236,12 @@ func OpenPullRequest(issueID IssueID) error {
 // FinishWorkingOnIssue finishes work on an issue
 func FinishWorkingOnIssue(issueID IssueID) error {
 	config := LoadConfig().GetPersistent()
-	profile := config.GetProfile(config.GetCurrentProfile())
+	issue, found := config.GetIssue(issueID)
+	if !found {
+		return errors.New("Issue not found")
+	}
+	profile := config.GetProfile(issue.Profile)
+
 	repo := config.GetRepository(profile.DefaultRepository)
 
 	Log.Infof("    🥂\tFinishing work on %v", issueID)
@@ -258,11 +262,6 @@ func FinishWorkingOnIssue(issueID IssueID) error {
 			return fmt.Errorf(errFailedToCloseIssue, err)
 		}
 
-	}
-
-	issue, found := config.GetIssue(issueID)
-	if !found {
-		return errors.New(errIssueIDNotFound)
 	}
 
 	Log.Infof("    🧹\tCleaning up issue workdir")
