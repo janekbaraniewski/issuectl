@@ -44,6 +44,9 @@ func StartWorkingOnIssue(config IssuectlConfig, issueID IssueID) error {
 			return err
 		}
 		generatedBranchName, err := getBranchName(config, issueBackend, profile, issueID)
+		if err != nil {
+			return err
+		}
 		branchName = generatedBranchName
 	}
 
