@@ -245,10 +245,12 @@ func OpenPullRequest(issueID IssueID, customTitle string) error {
 
 	repo := config.GetRepository(profile.DefaultRepository)
 
-	title := customTitle
-	if title == "" {
-		title = fmt.Sprintf("%v | %v", issue.ID, issue.Name)
+	titleText := customTitle
+	if titleText == "" {
+		titleText = issue.Name
 	}
+
+	title := fmt.Sprintf("%v | %v", issue.ID, titleText)
 
 	Log.Infofp("📂", "Opening PR for issue %v in %v/%v [%v]",
 		issueID,
