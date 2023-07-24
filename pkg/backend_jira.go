@@ -33,6 +33,10 @@ func NewJiraClient(email, apiToken, baseURL string) *Jira {
 	return &Jira{client: client, baseURL: baseURL, email: email, apiToken: apiToken}
 }
 
+func (j *Jira) GetIssueURL(owner string, repo RepoConfigName, issueID IssueID) (string, error) {
+	return fmt.Sprintf("%s/browse/%s", j.baseURL, issueID), nil
+}
+
 func (j *Jira) GetIssue(owner string, repo RepoConfigName, issueID IssueID) (interface{}, error) {
 	issue, _, err := j.client.Issue.Get(string(issueID), nil)
 	if err != nil {

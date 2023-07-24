@@ -29,6 +29,15 @@ func NewGitHubClient(token, baseURL, user string) *GitHub {
 	return &GitHub{client: client, baseURL: baseURL, token: token}
 }
 
+func (g *GitHub) GetIssueURL(owner string, repo RepoConfigName, issueID IssueID) (string, error) {
+	issueNumber, err := getIssueNumberFromString(issueID)
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("https://github.com/%s/%s/issues/%d", owner, repo, issueNumber), nil
+}
+
 func (g *GitHub) GetIssue(owner string, repo RepoConfigName, issueID IssueID) (interface{}, error) {
 	issueNumber, err := getIssueNumberFromString(issueID)
 	if err != nil {
