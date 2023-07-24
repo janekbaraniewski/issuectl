@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"runtime"
-	"strings"
 )
 
 // Logger struct holds the verbosity level
@@ -42,8 +40,8 @@ func (v *verbosityLogger) Infof(format string, args ...interface{}) {
 // output logs the message if the logger's verbosity level is greater than or equal to the level
 func (l *Logger) output(level int, message string) {
 	if l.verbosity >= level {
-		_, file, _, _ := runtime.Caller(2)
-		file = file[strings.LastIndex(file, "/")+1:]
+		// _, file, _, _ := runtime.Caller(2)
+		// file = file[strings.LastIndex(file, "/")+1:]
 		log.SetOutput(os.Stdout)
 		log.SetFlags(0)
 		// log.Printf("❖ %v|%s| %s\n", time.Now().Format(time.RFC3339), file, message)
