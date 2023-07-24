@@ -31,7 +31,7 @@ func StartWorkingOnIssue(config IssuectlConfig, issueID IssueID) error {
 		return fmt.Errorf("issueID already found in local configuration")
 	}
 
-	Log.Infof("    🏗️\tPreparing workspace for issue %v...", issueID)
+	Log.Infofp("🏗️", "Preparing workspace for issue %v...", issueID)
 
 	issueBackend, issueDirPath, err := initializeIssueBackendAndDir(config, profile, issueID)
 	if err != nil {
@@ -43,28 +43,30 @@ func StartWorkingOnIssue(config IssuectlConfig, issueID IssueID) error {
 		return err
 	}
 
-	Log.Infof("    🛬\tCloning repositories %v", repositories)
+	Log.Infofp("🛬", "Cloning repositories %v", repositories)
 
 	newIssue, err := createAndAddRepositoriesToIssue(config, profile, issueID, issueDirPath, branchName, branchName, repositories)
 	if err != nil {
 		return err
 	}
 
-	Log.Infof("    🫡\tMarking issue as In Progress in %v", profile.IssueBackend)
+	if profile.IssueBackend != "" {
+		Log.Infofp("🫡", "Marking issue as In Progress in %v", profile.IssueBackend)
 
-	// FIXME: this is a workaround for github. we should move this to backend
-	issueRepo := config.GetRepository(profile.DefaultRepository)
+		// FIXME: this is a workaround for github. we should move this to backend
+		issueRepo := config.GetRepository(profile.DefaultRepository)
 
-	if err := issueBackend.StartIssue(issueRepo.Owner, issueRepo.Name, issueID); err != nil {
-		return err
+		if err := issueBackend.StartIssue(issueRepo.Owner, issueRepo.Name, issueID); err != nil {
+			return err
+		}
 	}
 
 	if err := config.AddIssue(newIssue); err != nil {
 		return err
 	}
 
-	Log.Infof("    🚀\tWorkspace for %v ready!", issueID)
-	Log.Infof("    🧑‍💻\tRun `issuectl workon %v` to open it in VS Code", issueID)
+	Log.Infofp("🚀", "Workspace for %v ready!", issueID)
+	Log.Infofp("🧑‍💻", "Run `issuectl workon %v` to open it in VS Code", issueID)
 	return nil
 }
 
