@@ -84,6 +84,7 @@ type IssueConfig struct {
 	Repositories []RepoConfigName  `yaml:"repositories"`
 	Dir          string            `yaml:"dir"`
 	Profile      ProfileName       `yaml:"profile"`
+	PullRequests []string          `yaml:"pullRequests"`
 }
 
 type TextConfig struct {
