@@ -11,11 +11,11 @@
 export default {
   name: 'Home',
   metaInfo: {
-    title: 'Beneficial Funny Skunk',
+    title: 'issuectl',
     meta: [
       {
         property: 'og:title',
-        content: 'Beneficial Funny Skunk',
+        content: 'issuectl',
       },
     ],
   },
