@@ -15,8 +15,8 @@ jobs:
 
     - name: Configure Git
       run: |
-        git config --global user.email "bot@codekeeper.app"
-        git config --global user.name "codekeeper-bot[bot]"
+        git config --global user.email "dev@baraniewski.com"
+        git config --global user.name "Jan Baraniewski"
 
     - name: Set up Node.js
       uses: actions/setup-node@v2
