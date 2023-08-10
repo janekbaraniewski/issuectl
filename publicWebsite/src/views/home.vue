@@ -2,7 +2,7 @@
   <div class="home-container">
     <h1 class="home-text">issuectl</h1>
     <span class="home-text1">
-
+      streanline your work with version control and issue management software
     </span>
   </div>
 </template>
