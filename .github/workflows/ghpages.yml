@@ -1,0 +1,35 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Configure Git
+      run: |
+        git config --global user.email "bot@codekeeper.app"
+        git config --global user.name "codekeeper-bot[bot]"
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: cd publicWebsite && npm install
+
+    - name: Build
+      run: cd publicWebsite && npm run build
+
+    - name: Deploy
+      run: cd publicWebsite && npm run deploy
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT }} # You need to set this in your repository's secrets
